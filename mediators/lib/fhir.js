@@ -1,5 +1,7 @@
 'use strict'
 
+
+// a fetch wrapper for HAPI FHIR server.
 export const FhirApi = async (params) => {
     let _defaultHeaders = { "Content-Type": 'application/json' }
     if (!params.method) {
@@ -29,3 +31,5 @@ export const FhirApi = async (params) => {
         return res;
     }
 }
+
+
