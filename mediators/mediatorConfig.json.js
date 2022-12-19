@@ -1,5 +1,5 @@
 export const config = {
-  "urn": "urn:mediator:tutorial_scaffold",
+  "urn": "urn:mediator:mpi_push",
   "version": "1.0.0",
   "name": "Mediator Routes",
   "description": "Tutorial Scaffold Mediator",
