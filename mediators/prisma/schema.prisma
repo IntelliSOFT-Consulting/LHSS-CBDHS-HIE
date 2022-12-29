@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String    @id @default(uuid())
+  names               String
+  role                ROLE
+  email               String?   @unique
+  phone               String    @unique
+  password            String
+  salt                String
+  data                Json      @default("{ \"newUser\": true }")
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  verified            Boolean   @default(false)
+  disabled            Boolean   @default(false)
+  Post                Post[]
+  outbox              Message[] @relation("sender")
+  inbox               Message[] @relation("recipient")
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  description String
+  image       String?
+  userId      String
+  
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  sender      User     @relation("sender", fields: [senderId], references: [id])
+  recipient   User     @relation("recipient", fields: [recipientId], references: [id])
+  text        String
+  image       String?
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  senderId    String
+  recipientId String
+}
+
+enum ROLE {
+  ADMINISTRATOR
+  SPECIALIST
+  USER
+}

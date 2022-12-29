@@ -27,7 +27,7 @@ services:
 
     
     hapi-fhir-jpa:
-        image: hapiproject/hapi:latest
+        build: hapi
         container_name: hapi-fhir-jpa
         restart: on-failure
         ports:
@@ -81,8 +81,12 @@ services:
             - /etc/ssl/crt:/etc/nginx/certs
             
     mediators:
+        depends_on:
+            - openhim-core
         container_name: mediators
         build: mediators
+        networks:
+            - openhim
         ports:
             - "8082:3000"
         env_file:
