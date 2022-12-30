@@ -29,5 +29,9 @@ export const importMediators = () => {
 
 }
 
+utils.authenticate(openhimConfig, (e: any) => {
+    console.log(e);
+    return;
+})
 
 // export let apiHost = process.env.FHIR_BASE_URL

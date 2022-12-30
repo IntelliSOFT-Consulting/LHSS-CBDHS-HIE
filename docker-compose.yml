@@ -27,6 +27,7 @@ services:
 
     
     hapi-fhir-jpa:
+        image: intellisoftkenya/hapi:latest
         build: hapi
         container_name: hapi-fhir-jpa
         restart: on-failure
