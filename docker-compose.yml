@@ -38,7 +38,7 @@ services:
         volumes:
             - "./hapi:/hapi"
         environment:
-            SPRING_CONFIG_LOCATION: /hapi/application.yaml
+            SPRING_CONFIG_LOCATION: /hapi/src/main/resources/application.yaml
 
     openhim-core:
         container_name: openhim-core
