@@ -63,13 +63,13 @@ router.post('/patients', async (req, res) => {
 // patient search
 router.get('/patients', async (req, res) => {
     try {
-        let params = req.params;
-        let patients = (await FhirApi({
-            url: `/Patient${params?.name && `?name=${params?.name}`}
-        ${params?.id && `?_id=${params?.id}`}
-        ${(params?.nationalId || params?.passportNo) && `?identifier=${(params?.nationalId || params?.passportNo)}`}`
-        })).data?.entry || [];
-        res.json({ status: "success", results: patients.data })
+        let {data} = req.params;
+        // let patients = (await FhirApi({
+        //     url: `/Patient${data?.name && `?name=${data?.name}`}
+        // ${data?.id && `?_id=${data?.id}`}
+        // ${(data?.nationalId || data?.passportNo) && `?identifier=${(data?.nationalId || data?.passportNo)}`}`
+        // })).data?.entry || [];
+        res.json({ status: "success", results: data })
         return
     } catch (error) {
         res.statusCode = 400;
