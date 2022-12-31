@@ -3,9 +3,9 @@ import shrMediatorConfig from '../config/shrMediatorConfig.json'
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json'
 
 
-const openhimApiUrl = process.env.OPENHIM_API_URL
-const openhimUsername = process.env.OPENHIM_USERNAME
-const openhimPassword = process.env.OPENHIM_PASSWORD
+const openhimApiUrl = process.env.OPENHIM_API_URL;
+const openhimUsername = process.env.OPENHIM_USERNAME;
+const openhimPassword = process.env.OPENHIM_PASSWORD;
 
 const openhimConfig = {
     username: openhimUsername,
