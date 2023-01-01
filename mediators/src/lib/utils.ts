@@ -2,6 +2,7 @@ import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
 import { Agent } from 'https';
+import * as crypto from 'crypto';
 
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
@@ -20,13 +21,17 @@ const openhimConfig = {
     trustSelfSigned: true
 }
 
+utils.authenticate(openhimConfig, (e: any) => {
+    console.log(e ? e : "✅ OpenHIM authenticated successfully");
+})
+
 export const importMediators = () => {
     try {
         utils.registerMediator(openhimConfig, shrMediatorConfig, (e: any) => {
-            console.log(e);
+            console.log(e ? e : "");
         });
         utils.registerMediator(openhimConfig, mpiMediatorConfig, (e: any) => {
-            console.log(e);
+            console.log(e ? e : "");
         });
     } catch (error) {
         console.log(error);
@@ -36,9 +41,6 @@ export const importMediators = () => {
 
 export const getOpenHIMToken = async () => {
     try {
-        await utils.authenticate(openhimConfig, (e: any) => {
-            console.log("authentication error" && e);
-        })
         // console.log("Auth", auth)
         let token = await utils.genAuthHeaders(openhimConfig);
         return token
@@ -81,4 +83,45 @@ export const sendRequest = async () => {
 }
 
 
+export const createClient = async (name: string, password: string) => {
+
+    let headers = await getOpenHIMToken();
+    const clientPassword = password
+    const clientPasswordDetails: any = await genClientPassword(clientPassword)
+    let response = await (await fetch(`${openhimApiUrl}/clients`, {
+        headers: { ...headers, "Content-Type": "application/json" }, method: 'POST',
+        body: JSON.stringify({
+            passwordAlgorithm: "sha512",
+            passwordHash: clientPasswordDetails.passwordHash,
+            passwordSalt: clientPasswordDetails.passwordSalt,
+            clientID: name, name: name, "roles": [
+                "*"
+            ],
+        }), agent: new Agent({
+            rejectUnauthorized: false
+        })
+    })).text();
+    console.log("create client: ", response)
+    return response
+}
+
+
 // export let apiHost = process.env.FHIR_BASE_URL
+
+
+const genClientPassword = async (password: string) => {
+    return new Promise((resolve) => {
+        const passwordSalt = crypto.randomBytes(16)
+
+        // create passhash
+        let shasum = crypto.createHash('sha512')
+        shasum.update(password)
+        shasum.update(passwordSalt.toString('hex'))
+        const passwordHash = shasum.digest('hex')
+
+        resolve({
+            "passwordSalt": passwordSalt.toString('hex'),
+            "passwordHash": passwordHash
+        })
+    })
+}

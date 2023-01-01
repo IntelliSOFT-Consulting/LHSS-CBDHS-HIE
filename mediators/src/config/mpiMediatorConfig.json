@@ -22,14 +22,15 @@
       ],
       "methods": [
         "GET",
-        "POST"
+        "POST",
+        "PUT"
       ],
       "type": "http"
     }
   ],
   "endpoints": [
     {
-      "name": "Get Patients",
+      "name": "Patient Endpoints",
       "host": "mediators",
       "path": "/",
       "port": "8082",

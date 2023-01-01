@@ -32,12 +32,9 @@ const main_1 = __importDefault(require("./routes/main"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const patients_1 = __importDefault(require("./routes/patients"));
 const shr_1 = __importDefault(require("./routes/shr"));
-// import Reports from './routes/reports'
-const utils_1 = require("./lib/utils");
 const app = express_1.default();
 const PORT = 3000;
 app.use(cors_1.default());
-utils_1.importMediators();
 app.use('/', main_1.default);
 app.use('/auth', auth_1.default);
 app.use('/patients', patients_1.default);
