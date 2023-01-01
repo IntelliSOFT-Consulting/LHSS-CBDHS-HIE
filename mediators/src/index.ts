@@ -21,7 +21,7 @@ const PORT = 3000;
 app.use(cors())
 
 
-importMediators();
+
 
 app.use('/', Index)
 
