@@ -40,22 +40,22 @@ router.post('/', async (req, res) => {
     }
 })
 
-// patient search
-router.get('/patients', async (req, res) => {
-    try {
-        let params = req.params;
-        let patients = (await FhirApi({
-            url: `/Patient${params?.name && `?name=${params?.name}`}
-        ${params?.id && `?_id=${params?.id}`}
-        ${(params?.nationalId || params?.passportNo) && `?identifier=${(params?.nationalId || params?.passportNo)}`}`
-        })).data?.entry || [];
-        res.json({ status: "success", results: patients.data })
-        return
-    } catch (error) {
-        res.statusCode = 400;
-        res.json({ status: "error", error });
-        return
-    }
-})
+// // patient search
+// router.get('/patients', async (req, res) => {
+//     try {
+//         let params = req.params;
+//         let patients = (await FhirApi({
+//             url: `/Patient${params?.name && `?name=${params?.name}`}
+//         ${params?.id && `?_id=${params?.id}`}
+//         ${(params?.nationalId || params?.passportNo) && `?identifier=${(params?.nationalId || params?.passportNo)}`}`
+//         })).data?.entry || [];
+//         res.json({ status: "success", results: patients.data })
+//         return
+//     } catch (error) {
+//         res.statusCode = 400;
+//         res.json({ status: "error", error });
+//         return
+//     }
+// })
 
 export default router;
