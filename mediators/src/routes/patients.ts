@@ -8,9 +8,9 @@ router.use(express.json());
 
 
 // get patient information
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        let { id } = req.params;
+        let { id } = req.query;
         let patient = (await FhirApi({ url: `/Patient?identifier=${id}` })).data;
         res.json({ status: "success", patient, crossBorderId: patient.id });
         return;

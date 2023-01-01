@@ -23,6 +23,7 @@ const openhimConfig = {
 
 utils.authenticate(openhimConfig, (e: any) => {
     console.log(e ? e : "✅ OpenHIM authenticated successfully");
+    importMediators()
 })
 
 export const importMediators = () => {
