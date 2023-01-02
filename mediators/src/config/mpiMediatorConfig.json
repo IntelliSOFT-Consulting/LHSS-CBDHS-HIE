@@ -5,8 +5,8 @@
   "description": "This mediator is responsible for handling MPI bound requests.",
   "defaultChannelConfig": [
     {
-      "name": "CBDHS MPI Mediator",
-      "urlPattern": "^/patients$",
+      "name": "CBDHS MPI Mediator Channel",
+      "urlPattern": "^/patients/.*$",
       "routes": [
         {
           "name": "MPI Route",
@@ -14,7 +14,8 @@
           "path": "/patients",
           "port": "3000",
           "primary": true,
-          "type": "http"
+          "type": "http",
+          "status":"enabled"
         }
       ],
       "allow": [

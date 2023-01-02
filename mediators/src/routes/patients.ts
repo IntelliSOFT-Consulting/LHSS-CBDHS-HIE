@@ -26,9 +26,13 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         let data = req.body;
+        let crossBorderId = uuid();
+        if (data.county === "Kenya" || data.county === "Uganda") {
+            crossBorderId += data.county === "Kenya" ? "KE" : "UG"
+        }
         let patient = (await FhirApi({
             url: `/Patient`,
-            data: JSON.stringify(Patient(data)),
+            data: JSON.stringify(Patient({ ...data, crossBorderId })),
             method: 'POST'
         }))
         res.json({ status: "success", results: patient })

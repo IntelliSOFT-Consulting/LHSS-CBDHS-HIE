@@ -5,8 +5,8 @@
   "description": "This mediator is responsible for handling SHR bound requests.",
   "defaultChannelConfig": [
     {
-      "name": "CBDHS SHR Mediator",
-      "urlPattern": "^/shr$",
+      "name": "CBDHS SHR Mediator Channel",
+      "urlPattern": "^/shr/.*$",
       "routes": [
         {
           "name": "SHR Route",

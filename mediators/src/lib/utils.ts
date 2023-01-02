@@ -1,11 +1,21 @@
 import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
+import fhirMediatorConfig from '../config/fhirMediatorConfig.json';
+
 import { Agent } from 'https';
 import * as crypto from 'crypto';
 
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
+
+
+// mediators to be registered
+const mediators = [
+    shrMediatorConfig,
+    mpiMediatorConfig,
+    fhirMediatorConfig
+];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
     import('node-fetch').then(({ default: fetch }) => fetch(url, init));
@@ -23,17 +33,17 @@ const openhimConfig = {
 
 utils.authenticate(openhimConfig, (e: any) => {
     console.log(e ? e : "✅ OpenHIM authenticated successfully");
-    importMediators()
+    importMediators();
+    installChannels();
 })
 
 export const importMediators = () => {
     try {
-        utils.registerMediator(openhimConfig, shrMediatorConfig, (e: any) => {
-            console.log(e ? e : "");
-        });
-        utils.registerMediator(openhimConfig, mpiMediatorConfig, (e: any) => {
-            console.log(e ? e : "");
-        });
+        mediators.map((mediator: any) => {
+            utils.registerMediator(openhimConfig, mediator, (e: any) => {
+                console.log(e ? e : "");
+            });
+        })
     } catch (error) {
         console.log(error);
     }
@@ -54,9 +64,10 @@ export const getOpenHIMToken = async () => {
 export const installChannels = async () => {
 
     let headers = await getOpenHIMToken();
-    [shrMediatorConfig.urn, mpiMediatorConfig.urn].map(async (urn: string) => {
-        let response = await (await fetch(`${openhimApiUrl}/mediators/${urn}/channels`, {
-            headers: headers, method: 'POST', body: JSON.stringify({ a: "y" }), agent: new Agent({
+    mediators.map(async (mediator: any) => {
+        console.log(mediator.defaultChannelConfig[0]);
+        let response = await (await fetch(`${openhimApiUrl}/channels`, {
+            headers: { ...headers, "Content-Type": "application/json" }, method: 'POST', body: JSON.stringify(mediator.defaultChannelConfig[0]), agent: new Agent({
                 rejectUnauthorized: false
             })
         })).text();
@@ -73,7 +84,7 @@ export const sendRequest = async () => {
     let headers = await getOpenHIMToken();
     [shrMediatorConfig.urn, mpiMediatorConfig.urn].map(async (urn: string) => {
         let response = await (await fetch(`${openhimApiUrl}/patients`, {
-            headers: headers, method: 'POST', body: JSON.stringify({ a: "y" }), agent: new Agent({
+            headers: { ...headers, "Content-Type": "application/json" }, method: 'POST', body: JSON.stringify({ a: "y" }), agent: new Agent({
                 rejectUnauthorized: false
             })
         })).text();
