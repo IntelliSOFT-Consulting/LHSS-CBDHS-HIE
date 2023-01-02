@@ -65,7 +65,6 @@ export const installChannels = async () => {
 
     let headers = await getOpenHIMToken();
     mediators.map(async (mediator: any) => {
-        console.log(mediator.defaultChannelConfig[0]);
         let response = await (await fetch(`${openhimApiUrl}/channels`, {
             headers: { ...headers, "Content-Type": "application/json" }, method: 'POST', body: JSON.stringify(mediator.defaultChannelConfig[0]), agent: new Agent({
                 rejectUnauthorized: false
