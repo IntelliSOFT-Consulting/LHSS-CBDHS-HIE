@@ -63,6 +63,7 @@ services:
             - mongo
         networks:
             - openhim
+            - hapi-fhir
         healthcheck:
             test: "curl -sSk https://openhim-core:8080/heartbeat || exit 1"
             interval: 30s
