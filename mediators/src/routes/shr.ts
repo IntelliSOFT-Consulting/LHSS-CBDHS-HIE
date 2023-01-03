@@ -1,5 +1,5 @@
 import express from 'express';
-import { FhirApi } from '../lib/fhir';
+import { FhirApi } from '../lib/utils';
 
 
 export const router = express.Router();

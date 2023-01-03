@@ -6,12 +6,12 @@
   "defaultChannelConfig": [
     {
       "name": "CBDHS FHIR Proxy Mediator Channel",
-      "urlPattern": "/fhir/.*",
+      "urlPattern": "/mdm",
       "routes": [
         {
           "name": "FHIR Proxy Route",
           "host": "hapi-fhir-jpa",
-          "path": "/fhir/.*",
+          "path": "/mdm",
           "port": "8080",
           "primary": true,
           "type": "http",
@@ -33,7 +33,7 @@
     {
       "name": "HAPI FHIR Proxy Endpoint",
       "host": "hapi-fhir-jpa",
-      "path": "/fhir/.*",
+      "path": "/mdm",
       "port": "8080",
       "primary": true,
       "type": "http"

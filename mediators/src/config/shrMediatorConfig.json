@@ -6,7 +6,7 @@
   "defaultChannelConfig": [
     {
       "name": "CBDHS SHR Mediator Channel",
-      "urlPattern": "^/shr/.*$",
+      "urlPattern": "/shr",
       "routes": [
         {
           "name": "SHR Route",

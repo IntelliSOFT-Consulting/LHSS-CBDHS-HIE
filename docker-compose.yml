@@ -2,6 +2,7 @@ version: "3"
 networks:
     openhim:
     hapi-fhir:
+    mediators:
 
 services:
     mongo:
@@ -30,8 +31,7 @@ services:
 
     
     hapi-fhir-jpa:
-        image: intellisoftkenya/hapi:latest
-        build: hapi
+        image: intellisoftkenya/hapi-fhir:latest
         container_name: hapi-fhir-jpa
         restart: on-failure
         networks:
@@ -41,7 +41,7 @@ services:
         depends_on:
             - hapi-fhir-postgres
         volumes:
-            - "./hapi:/hapi"
+            - "./hapi-fhir:/hapi"
         environment:
             SPRING_CONFIG_LOCATION: /hapi/src/main/resources/application.yaml
 
@@ -65,6 +65,7 @@ services:
         networks:
             - openhim
             - hapi-fhir
+            - mediators
         healthcheck:
             test: "curl -sSk https://openhim-core:8080/heartbeat || exit 1"
             interval: 30s
@@ -93,6 +94,8 @@ services:
             - openhim-core
         container_name: mediators
         build: mediators
+        volumes:
+            - ./mediators:/usr/mediators
         networks:
             - openhim
             - hapi-fhir
@@ -105,3 +108,4 @@ volumes:
     mongodb-data:
     hapi-fhir-postgres:
     hapi:
+    mediators:

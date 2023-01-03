@@ -1,17 +1,17 @@
 {
-  "urn": "urn:mediator:mpi_push",
+  "urn": "urn:mediator:mpi_search",
   "version": "1.0.0",
-  "name": "CBDHS MPI Mediator",
-  "description": "This mediator is responsible for handling MPI bound requests.",
+  "name": "CBDHS MPI Search Mediators",
+  "description": "This mediator is responsible for handling MPI search requests.",
   "defaultChannelConfig": [
     {
-      "name": "CBDHS MPI Mediator Channel",
-      "urlPattern": "/patients",
+      "name": "CBDHS MPI Search Channel",
+      "urlPattern": "/search",
       "routes": [
         {
           "name": "MPI Route",
           "host": "mediators",
-          "path": "/patients",
+          "path": "/search",
           "port": "3000",
           "primary": true,
           "type": "http",
@@ -33,9 +33,10 @@
     {
       "name": "Patient CRUD Endpoints",
       "host": "mediators",
-      "path": "/patients",
+      "path": "/patients/search",
       "port": "3000",
       "primary": true,
+      "status":"enabled",
       "type": "http"
     }
   ]

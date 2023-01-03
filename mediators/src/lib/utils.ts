@@ -2,17 +2,21 @@ import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
 import fhirMediatorConfig from '../config/fhirMediatorConfig.json';
+import advancedSearchConfig from '../config/advancedSearchConfig.json';
+
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
 
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
+import { uuid } from 'uuidv4';
 
 
 // mediators to be registered
 const mediators = [
     shrMediatorConfig,
+    advancedSearchConfig,
     mpiMediatorConfig,
     fhirMediatorConfig
 ];
@@ -78,6 +82,186 @@ export const installChannels = async () => {
 
 
 
+export let apiHost = process.env.FHIR_BASE_URL
+
+
+
+// a fetch wrapper for HAPI FHIR server.
+export const FhirApi = async (params: any) => {
+    let _defaultHeaders = { "Content-Type": 'application/json' }
+    if (!params.method) {
+        params.method = 'GET';
+    }
+    try {
+        let response = await fetch(String(`${apiHost}${params.url}`), {
+            headers: _defaultHeaders,
+            method: params.method ? String(params.method) : 'GET',
+            ...(params.method !== 'GET' && params.method !== 'DELETE') && { body: String(params.data) }
+        });
+        let responseJSON = await response.json();
+        let res = {
+            status: "success",
+            statusText: response.statusText,
+            data: responseJSON
+        };
+        return res;
+    } catch (error) {
+        console.error(error);
+        let res = {
+            statusText: "FHIRFetch: server error",
+            status: "error",
+            data: error
+        };
+        console.error(error);
+        return res;
+    }
+}
+
+// Sample Patient Object.
+// Create Patient in the MPI
+
+// required
+
+// patient id, patient name
+
+export let Patient = (patient: any) => {
+    return {
+        resourceType: 'Patient',
+        ...(patient.id && { id: patient.id }),
+        identifier: [
+            {
+                "value": patient.pointOfCareId,
+                "id": "POINT_OF_CARE_ID"
+            },
+            {
+                "value": patient.crossBorderId,
+                "id": "CROSS_BORDER_ID"
+            },
+            {
+                "value": patient.nationalId,
+                "id": "NATIONAL_ID",
+                "system": patient.country
+            }
+        ],
+        name: [
+            {
+                family: patient.surname,
+                given: [patient.otherNames,],
+            },
+        ],
+        maritalStatus: {
+            "coding": [
+                {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+                    "code": patient.maritalStatus.toUpperCase(),
+                    "display": patient.maritalStatus
+                }
+            ],
+            "text": patient.maritalStatus
+        },
+        telecom: [
+            {
+                value: patient.phone,
+            },
+        ],
+        birthDate: new Date(patient.dob).toISOString().slice(0, 10),
+        gender: (patient.sex).toLowerCase(),
+        address: [
+            {
+                state: patient.county,
+                district: patient.district,
+                city: patient.subCounty,
+                village: patient.ward || patient.region,
+                country: patient.country
+            },
+        ],
+        contact: [
+            {
+                telecom: [
+                    {
+                        value: patient.nextOfKinPhone,
+                    },
+                ],
+                name: {
+                    family: patient.nextOfKinName,
+                },
+                relationship: [{
+                    text: patient.nextOfKinRelationship
+                }]
+            },
+        ],
+    };
+};
+
+// Sample Observation Object For Dynamic Building
+
+// Sample Encounter Object For Dynamic Building
+
+export const parseIdentifiers = async (patientId: string) => {
+    let patient = (await FhirApi({ url: `/Patient?identifier=${patientId}`, })).data
+    if (!(patient?.total > 0 || patient?.entry.length > 0)) {
+        return null;
+    }
+    let identifiers = patient.entry[0].resource.identifier;
+    return identifiers.map((id: any) => {
+        return {
+            [id.id]: id
+        }
+    })
+}
+
+// parseIdentifiers("KE-2023-01-FBE66").then((res)=> {
+//     console.log(res)
+// })
+export const parseFhirPatient = (patient: any) => {
+    let identifiers = patient.identifier;
+    let _ids: any = {}
+    for (let id of identifiers) {
+        _ids[id.id] = id
+    }
+    return {
+        surname: patient.name[0].family,
+        crossBorderId: _ids.CROSS_BORDER_ID?.value || '',
+        pointOfCareId: _ids.POINT_OF_CARE_ID?.value || '',
+        nationalId: _ids.NATIONAL_ID?.value || '',
+        otherNames: patient.name[0].given[0],
+        sex: patient.gender,
+        dob: new Date(patient.birthDate).toDateString(),
+        maritalStatus: patient.maritalStatus.coding[0].display,
+        // "occupation": "Student",
+        // "education": "Primary School",
+        deceased: patient.deceasedBoolean,
+        // "address": "58, Nakuru Town East",
+        phone: patient.telecom[0].value,
+        country: patient.address[0].country,
+        region: patient.address[0].country === "Uganda" ? patient.address[0].village : undefined,
+        district: patient.address[0].district || undefined,
+        county: patient.address[0].state,
+        subCounty: patient.address[0].city,
+        nextOfKinName: patient.contact[0].relationship[0].text,
+        nextOfKinRelationship: patient.contact[0].name.family,
+        nextOfKinPhone: patient.contact[0].telecom.value,
+    }
+}
+
+
+
+export const getPatientSummary = async (crossBorderId: string) => {
+
+    let patient = (await FhirApi({ url: `/Patient?identifier=${crossBorderId}`, })).data
+    console.log(patient);
+
+    let identifiers = patient.entry[0].resource.identifier;
+    identifiers = identifiers.map((id: any) => {
+        return {
+            [id.id]: id
+        }
+    })
+    return parseFhirPatient(patient.entry[0].resource)
+}
+
+
+
 export const sendRequest = async () => {
 
     let headers = await getOpenHIMToken();
@@ -87,7 +271,7 @@ export const sendRequest = async () => {
                 rejectUnauthorized: false
             })
         })).text();
-        console.log(response)
+        console.log(response);
     })
 
 
@@ -135,4 +319,14 @@ const genClientPassword = async (password: string) => {
             "passwordHash": passwordHash
         })
     })
+}
+
+
+
+export const generateCrossBorderId = (county: string) => {
+
+    let month = new Date().getMonth() + 1;
+    let id = `${county.toUpperCase().slice(0, 2)}-${new Date().getFullYear()}-${(month < 10) ? '0' + month.toString() : month.toString()}-${uuid().slice(0, 5).toUpperCase()}`
+    return id
+
 }
