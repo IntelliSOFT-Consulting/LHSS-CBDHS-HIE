@@ -10,7 +10,7 @@
       "routes": [
         {
           "name": "FHIR Proxy Route",
-          "host": "hapi-fhir-jpa",
+          "host": "mediators",
           "path": "/matching",
           "port": "8080",
           "primary": true,
@@ -32,7 +32,7 @@
   "endpoints": [
     {
       "name": "HAPI FHIR Proxy Endpoint",
-      "host": "hapi-fhir-jpa",
+      "host": "mediators",
       "path": "/matching",
       "port": "8080",
       "primary": true,
