@@ -11,7 +11,7 @@
         {
           "name": "FHIR Proxy Route",
           "host": "hapi-fhir-jpa",
-          "path": "/mdm",
+          "path": "/matching",
           "port": "8080",
           "primary": true,
           "type": "http",
@@ -33,7 +33,7 @@
     {
       "name": "HAPI FHIR Proxy Endpoint",
       "host": "hapi-fhir-jpa",
-      "path": "/mdm",
+      "path": "/matching",
       "port": "8080",
       "primary": true,
       "type": "http"
