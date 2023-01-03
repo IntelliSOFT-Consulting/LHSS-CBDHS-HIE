@@ -1,11 +1,8 @@
 FROM node:alpine
 WORKDIR /usr/mediators/
 
-
-COPY package.json .
-RUN npm install typescript yarn prisma -g --force
+RUN npm install typescript yarn -g --force
 RUN yarn install
-COPY . .
 RUN yarn build
 
 EXPOSE 3000
