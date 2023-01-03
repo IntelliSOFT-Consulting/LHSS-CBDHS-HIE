@@ -94,6 +94,8 @@ services:
             - openhim-core
         container_name: mediators
         build: mediators
+        volumes:
+            - ./mediators:/usr/mediators
         networks:
             - openhim
             - hapi-fhir
@@ -106,3 +108,4 @@ volumes:
     mongodb-data:
     hapi-fhir-postgres:
     hapi:
+    mediators:
