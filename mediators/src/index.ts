@@ -7,6 +7,7 @@ dotenv.config() // Load environment variables
 
 //Import routes 
 import Index from './routes/main'
+import Matching from './routes/matching'
 import Auth from './routes/auth'
 import Patients from './routes/patients'
 import SHR from './routes/shr'
@@ -36,7 +37,7 @@ app.use((req, res, next) => {
 
 
 app.use('/', Index)
-
+app.use('/matching', Matching)
 app.use('/auth', Auth)
 app.use('/patients', Patients)
 app.use('/shr', SHR)

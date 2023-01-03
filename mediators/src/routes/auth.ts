@@ -10,8 +10,8 @@ router.get("/token", async (req: Request, res: Response) => {
     try {
         let token = await getOpenHIMToken();
         await installChannels()
-        res.json({ status: "success", token });
         res.set(token);
+        res.json({ status: "success", token });
         return;
     }
     catch (error) {

@@ -1,19 +1,62 @@
 import { FhirApi } from "./utils"
 
 
-const findPossibleMatches = async () => {
-    let res = await FhirApi({
-        url: `/$match`
-    })
+export const findPossibleMatches = async (count: number) => {
+    let res = (await FhirApi({
+        url: `/$mdm-query-links?_offset=${0}&_count=${count}`,
+    })).data
+    console.log(res.parameter);
+    let matches = [];
+    for (let p of res.parameter) {
+        if (p.name === "link") {
+            // matches.push(p);
+            let obj: any = {}
+            p.part.map((part: any) => {
+                obj[part.name] = part.valueString || part.valueBoolean || "";
+            });
+            matches.push(obj);
+        }
+    }
+    return matches;
 }
 
 
-const linkRecords = async (goldenRecord: string, sourceRecord: string) => {
+export const linkRecords = async (goldenRecord: string, sourceRecord: string) => {
     let res = await FhirApi({
-        url: `/$match`,
-        method:'POST',
-        data:JSON.stringify({
-
+        url: `/$mdm-create-link`,
+        method: 'POST',
+        data: JSON.stringify({
+            "resourceType": "Parameters",
+            "parameter": [{
+                "name": "goldenResourceId",
+                "valueString": `Patient/${goldenRecord}`
+            }, {
+                "name": "resourceId",
+                "valueString": `Patient/${sourceRecord}`
+            }, {
+                "name": "matchResult",
+                "valueString": "MATCH"
+            }]
         })
     })
+    return res
+}
+
+
+export const mergeRecords = async (from: string, to: string) => {
+    let res = await FhirApi({
+        url: `/$mdm-merge-golden-resources`,
+        method: 'POST',
+        data: JSON.stringify({
+            "resourceType": "Parameters",
+            "parameter": [{
+                "name": "fromGoldenResourceId",
+                "valueString": `Patient/${from}`
+            }, {
+                "name": "toGoldenResourceId",
+                "valueString": `Patient/${to}`
+            }]
+        })
+    })
+    return res
 }

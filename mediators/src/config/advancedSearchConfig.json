@@ -11,7 +11,7 @@
         {
           "name": "MPI Route",
           "host": "mediators",
-          "path": "/search",
+          "path": "/patients/search",
           "port": "3000",
           "primary": true,
           "type": "http",
