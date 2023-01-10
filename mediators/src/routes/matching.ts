@@ -3,8 +3,6 @@ import express from "express";
 import { findPossibleMatches, linkRecords, mergeRecords } from "../lib/patientMatching";
 import { FhirApi, parseFhirPatient } from '../lib/utils';
 
-// https://levelup.gitconnected.com/how-to-add-swagger-ui-to-existing-node-js-and-express-js-project-2c8bad9364ce
-// findPossibleMatches(10);
 
 
 const router = express.Router()
