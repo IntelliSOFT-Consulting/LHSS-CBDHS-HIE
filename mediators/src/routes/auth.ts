@@ -30,6 +30,11 @@ router.post("/client", async (req: Request, res: Response) => {
         await getOpenHIMToken();
         let { name, password } = req.body;
         let response = await createClient(name, password);
+        if (response === "Unauthorized" || response.indexOf("error")) {
+            res.statusCode = 401;
+            res.json({ status: "error", error: response });
+            return;
+        }
         res.json({ status: "success", response });
         return;
     }

@@ -93,7 +93,9 @@ services:
         depends_on:
             - openhim-core
         container_name: mediators
-        build: mediators
+        build:
+            context: mediators
+            dockerfile: Dockerfile.dev
         volumes:
             - ./mediators:/usr/mediators
         networks:

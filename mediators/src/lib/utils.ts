@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
 import { uuid } from 'uuidv4';
+import exp from 'constants';
 
 
 // mediators to be registered
@@ -74,13 +75,9 @@ export const installChannels = async () => {
                 rejectUnauthorized: false
             })
         })).text();
-        console.log(response)
+        console.log(response);
     })
-
-
 }
-
-
 
 export let apiHost = process.env.FHIR_BASE_URL
 
@@ -214,35 +211,42 @@ export const parseIdentifiers = async (patientId: string) => {
 //     console.log(res)
 // })
 export const parseFhirPatient = (patient: any) => {
-    let identifiers = patient.identifier;
-    let _ids: any = {}
-    for (let id of identifiers) {
-        _ids[id.id] = id
-    }
-    return {
-        surname: patient.name[0].family,
-        crossBorderId: _ids.CROSS_BORDER_ID?.value || '',
-        pointOfCareId: _ids.POINT_OF_CARE_ID?.value || '',
-        nationalId: _ids.NATIONAL_ID?.value || '',
-        otherNames: patient.name[0].given[0],
-        sex: patient.gender,
-        dob: new Date(patient.birthDate).toDateString(),
-        maritalStatus: patient.maritalStatus.coding[0].display,
-        // "occupation": "Student",
-        // "education": "Primary School",
-        deceased: patient.deceasedBoolean,
-        // "address": "58, Nakuru Town East",
-        phone: patient.telecom[0].value,
-        country: patient.address[0].country,
-        region: patient.address[0].country === "Uganda" ? patient.address[0].village : undefined,
-        district: patient.address[0].district || undefined,
-        county: patient.address[0].state,
-        subCounty: patient.address[0].city,
-        nextOfKinName: patient.contact[0].relationship[0].text,
-        nextOfKinRelationship: patient.contact[0].name.family,
-        nextOfKinPhone: patient.contact[0].telecom.value,
+    try {
+        let identifiers = patient.identifier;
+        let _ids: any = {}
+        for (let id of identifiers) {
+            _ids[id.id] = id
+        }
+        console.log(_ids)
+        return {
+            surname: patient.name[0].family,
+            crossBorderId: _ids.CROSS_BORDER_ID?.value || '',
+            pointOfCareId: _ids.POINT_OF_CARE_ID?.value || '',
+            nationalId: _ids.NATIONAL_ID?.value || '',
+            otherNames: patient.name[0].given[0],
+            sex: patient.gender,
+            dob: new Date(patient.birthDate).toDateString(),
+            maritalStatus: patient.maritalStatus.coding[0].display,
+            // "occupation": "Student",
+            // "education": "Primary School",
+            deceased: patient.deceasedBoolean,
+            // "address": "58, Nakuru Town East",
+            phone: patient.telecom[0].value,
+            country: patient.address[0].country,
+            region: patient.address[0].country === "Uganda" ? patient.address[0].village : undefined,
+            district: patient.address[0].district || undefined,
+            county: patient.address[0].state,
+            subCounty: patient.address[0].city,
+            nextOfKinName: patient.contact[0].relationship[0].text,
+            nextOfKinRelationship: patient.contact[0].name.family,
+            nextOfKinPhone: patient.contact[0].telecom,
+        }
+    } catch (error) {
+        console.log("ERROR parsing Patient resource: ", error)
+        return null
     }
 }
+
 
 
 
@@ -306,13 +310,13 @@ export const createClient = async (name: string, password: string) => {
 
 const genClientPassword = async (password: string) => {
     return new Promise((resolve) => {
-        const passwordSalt = crypto.randomBytes(16)
+        const passwordSalt = crypto.randomBytes(16);
 
         // create passhash
-        let shasum = crypto.createHash('sha512')
-        shasum.update(password)
-        shasum.update(passwordSalt.toString('hex'))
-        const passwordHash = shasum.digest('hex')
+        let shasum = crypto.createHash('sha512');
+        shasum.update(password);
+        shasum.update(passwordSalt.toString('hex'));
+        const passwordHash = shasum.digest('hex');
 
         resolve({
             "passwordSalt": passwordSalt.toString('hex'),
@@ -324,9 +328,22 @@ const genClientPassword = async (password: string) => {
 
 
 export const generateCrossBorderId = (county: string) => {
-
     let month = new Date().getMonth() + 1;
     let id = `${county.toUpperCase().slice(0, 2)}-${new Date().getFullYear()}-${(month < 10) ? '0' + month.toString() : month.toString()}-${uuid().slice(0, 5).toUpperCase()}`
-    return id
+    return id;
+    // check if it exists
+}
 
+export const getPatientByCrossBorderId = async (crossBorderId: string) => {
+    try {
+        let patient = (await FhirApi({ url: `/Patient?identifier=${crossBorderId}` })).data;
+        if (patient?.total > 0 || patient?.entry?.length > 0) {
+            patient = patient.entry[0].resource;
+            return patient;
+        }
+        return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
