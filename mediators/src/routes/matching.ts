@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
                 return;
             default:
                 res.statusCode = 400;
-                res.json({ status: "error", "error": "operation is required" });
+                res.json({ status: "error", "error": "parameter *operation* is required" });
                 return;
         }
     } catch (error) {
