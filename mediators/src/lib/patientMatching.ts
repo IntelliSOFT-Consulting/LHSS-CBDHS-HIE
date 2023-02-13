@@ -42,6 +42,27 @@ export const linkRecords = async (goldenRecord: string, sourceRecord: string) =>
     return res
 }
 
+export const getDuplicateGoldenRecords = async (count: number) => {
+    let res = (await FhirApi({
+        url: `/$mdm-duplicate-golden-resources?_offset=${0}&_count=${count}`,
+    })).data
+    // console.log(res.parameter);
+    let duplicates = [];
+    for (let p of res.parameter) {
+        if (p.name === "link") {
+            // duplicates.push(p);
+            let obj: any = {}
+            p.part.map((part: any) => {
+                obj[part.name] = part.valueString || part.valueBoolean || "";
+            });
+            duplicates.push(obj);
+        }
+    }
+    console.log(duplicates)
+    return duplicates;
+}
+
+getDuplicateGoldenRecords(10)
 
 export const mergeRecords = async (from: string, to: string) => {
     let res = await FhirApi({
@@ -60,3 +81,6 @@ export const mergeRecords = async (from: string, to: string) => {
     })
     return res
 }
+
+
+

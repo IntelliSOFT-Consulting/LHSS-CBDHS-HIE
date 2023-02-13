@@ -4,15 +4,17 @@ import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
 import fhirMediatorConfig from '../config/fhirMediatorConfig.json';
 import advancedSearchConfig from '../config/advancedSearchConfig.json';
 
-
 import { Agent } from 'https';
 import * as crypto from 'crypto';
 
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
 import { uuid } from 'uuidv4';
-import exp from 'constants';
 
+
+// const ipsComponents = {
+//     ""
+// }
 
 // mediators to be registered
 const mediators = [
@@ -67,7 +69,6 @@ export const getOpenHIMToken = async () => {
 }
 
 export const installChannels = async () => {
-
     let headers = await getOpenHIMToken();
     mediators.map(async (mediator: any) => {
         let response = await (await fetch(`${openhimApiUrl}/channels`, {
@@ -80,7 +81,6 @@ export const installChannels = async () => {
 }
 
 export let apiHost = process.env.FHIR_BASE_URL
-
 
 
 // a fetch wrapper for HAPI FHIR server.
@@ -121,81 +121,13 @@ export const FhirApi = async (params: any) => {
 
 // patient id, patient name
 
-export let Patient = (patient: any) => {
-    return {
-        resourceType: 'Patient',
-        ...(patient.id && { id: patient.id }),
-        identifier: [
-            {
-                "value": patient.pointOfCareId,
-                "id": "POINT_OF_CARE_ID"
-            },
-            {
-                "value": patient.crossBorderId,
-                "id": "CROSS_BORDER_ID"
-            },
-            {
-                "value": patient.nationalId,
-                "id": "NATIONAL_ID",
-                "system": patient.country
-            }
-        ],
-        name: [
-            {
-                family: patient.surname,
-                given: [patient.otherNames,],
-            },
-        ],
-        maritalStatus: {
-            "coding": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
-                    "code": patient.maritalStatus.toUpperCase(),
-                    "display": patient.maritalStatus
-                }
-            ],
-            "text": patient.maritalStatus
-        },
-        telecom: [
-            {
-                value: patient.phone,
-            },
-        ],
-        birthDate: new Date(patient.dob).toISOString().slice(0, 10),
-        gender: (patient.sex).toLowerCase(),
-        address: [
-            {
-                state: patient.county,
-                district: patient.district,
-                city: patient.subCounty,
-                village: patient.ward || patient.region,
-                country: patient.country
-            },
-        ],
-        contact: [
-            {
-                telecom: [
-                    {
-                        value: patient.nextOfKinPhone,
-                    },
-                ],
-                name: {
-                    family: patient.nextOfKinName,
-                },
-                relationship: [{
-                    text: patient.nextOfKinRelationship
-                }]
-            },
-        ],
-    };
-};
 
 // Sample Observation Object For Dynamic Building
 
 // Sample Encounter Object For Dynamic Building
 
 export const parseIdentifiers = async (patientId: string) => {
-    let patient = (await FhirApi({ url: `/Patient?identifier=${patientId}`, })).data
+    let patient: any = (await FhirApi({ url: `/Patient?identifier=${patientId}`, })).data
     if (!(patient?.total > 0 || patient?.entry.length > 0)) {
         return null;
     }
@@ -207,9 +139,6 @@ export const parseIdentifiers = async (patientId: string) => {
     })
 }
 
-// parseIdentifiers("KE-2023-01-FBE66").then((res)=> {
-//     console.log(res)
-// })
 export const parseFhirPatient = (patient: any) => {
     try {
         let identifiers = patient.identifier;
@@ -251,23 +180,26 @@ export const parseFhirPatient = (patient: any) => {
 
 
 export const getPatientSummary = async (crossBorderId: string) => {
-
-    let patient = (await FhirApi({ url: `/Patient?identifier=${crossBorderId}`, })).data
-    console.log(patient);
-
-    let identifiers = patient.entry[0].resource.identifier;
-    identifiers = identifiers.map((id: any) => {
-        return {
-            [id.id]: id
-        }
-    })
-    return parseFhirPatient(patient.entry[0].resource)
+    try {
+        let patient = (await FhirApi({ url: `/Patient?identifier=${crossBorderId}`, })).data
+        console.log(patient);
+        // if(patient.entry.length )
+        let identifiers = patient.entry[0].resource.identifier;
+        identifiers = identifiers.map((id: any) => {
+            return {
+                [id.id]: id
+            }
+        })
+        return parseFhirPatient(patient.entry[0].resource)
+    } catch (error) {
+        console.log(error);
+        return null
+    }
 }
 
 
 
 export const sendRequest = async () => {
-
     let headers = await getOpenHIMToken();
     [shrMediatorConfig.urn, mpiMediatorConfig.urn].map(async (urn: string) => {
         let response = await (await fetch(`${openhimApiUrl}/patients`, {
@@ -276,14 +208,11 @@ export const sendRequest = async () => {
             })
         })).text();
         console.log(response);
-    })
-
-
+    });
 }
 
 
 export const createClient = async (name: string, password: string) => {
-
     let headers = await getOpenHIMToken();
     const clientPassword = password
     const clientPasswordDetails: any = await genClientPassword(clientPassword)
@@ -311,13 +240,11 @@ export const createClient = async (name: string, password: string) => {
 const genClientPassword = async (password: string) => {
     return new Promise((resolve) => {
         const passwordSalt = crypto.randomBytes(16);
-
         // create passhash
         let shasum = crypto.createHash('sha512');
         shasum.update(password);
         shasum.update(passwordSalt.toString('hex'));
         const passwordHash = shasum.digest('hex');
-
         resolve({
             "passwordSalt": passwordSalt.toString('hex'),
             "passwordHash": passwordHash
@@ -342,6 +269,44 @@ export const getPatientByCrossBorderId = async (crossBorderId: string) => {
             return patient;
         }
         return null;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+
+export const parseObservationResource = async (data: any) => {
+    try {
+        let codes = data
+        // { observation, value }
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+export const Observation = async function (data: any) {
+
+    
+}
+
+export const parseEncounterResource = async (data: any) => {
+    try {
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+
+
+
+
+export const parseMedication = async (data: any) => {
+    try {
+
     } catch (error) {
         console.log(error);
         return null;

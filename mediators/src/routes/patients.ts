@@ -1,6 +1,6 @@
 import express from 'express';
-import { FhirApi, getPatientByCrossBorderId, parseFhirPatient, Patient } from '../lib/utils';
-import { generateCrossBorderId } from '../lib/utils';
+import { FhirApi, getPatientByCrossBorderId, parseFhirPatient, generateCrossBorderId } from '../lib/utils';
+import { Patient } from '../lib/resources';
 
 export const router = express.Router();
 

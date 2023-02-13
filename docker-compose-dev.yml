@@ -14,7 +14,7 @@ services:
             - openhim
         volumes:
             - mongodb-data:/data/db
-        restart: unless-stopped
+        restart: always
 
     hapi-fhir-postgres:
         container_name: hapi-fhir-postgres
@@ -47,6 +47,7 @@ services:
 
     openhim-core:
         container_name: openhim-core
+        restart: on-failure
         image: jembi/openhim-core:latest
         environment:
             - mongo_url=mongodb://mongo/openhim
@@ -75,7 +76,7 @@ services:
     openhim-console:
         container_name: openhim-console
         image: jembi/openhim-console:latest
-        restart: unless-stopped
+        restart: on-failure
         networks:
             - openhim
         ports:
@@ -93,6 +94,7 @@ services:
         depends_on:
             - openhim-core
         container_name: mediators
+        restart: on-failure
         build:
             context: mediators
             dockerfile: Dockerfile.dev
