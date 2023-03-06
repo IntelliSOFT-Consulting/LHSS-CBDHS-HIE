@@ -1,5 +1,6 @@
 import express from 'express';
 import { FhirApi, getPatientByCrossBorderId } from '../lib/utils';
+import { validateResource } from '../lib/validate';
 
 
 export const router = express.Router();
