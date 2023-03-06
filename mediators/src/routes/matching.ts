@@ -1,7 +1,8 @@
 import express from "express";
 
 import { findPossibleMatches, linkRecords, mergeRecords } from "../lib/patientMatching";
-import { FhirApi, parseFhirPatient } from '../lib/utils';
+import { FhirApi } from '../lib/utils';
+import { parseFhirPatient } from "../lib/resources";
 
 
 
@@ -33,7 +34,7 @@ router.post('/', async (req, res) => {
                 return;
             default:
                 res.statusCode = 400;
-                res.json({ status: "error", "error": "operation is required" });
+                res.json({ status: "error", "error": "parameter *operation* is required" });
                 return;
         }
     } catch (error) {

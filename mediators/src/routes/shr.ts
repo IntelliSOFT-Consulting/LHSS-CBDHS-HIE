@@ -1,5 +1,6 @@
 import express from 'express';
-import { FhirApi } from '../lib/utils';
+import { FhirApi, getPatientByCrossBorderId } from '../lib/utils';
+import { validateResource } from '../lib/validate';
 
 
 export const router = express.Router();
@@ -8,11 +9,14 @@ router.use(express.json());
 
 
 // get patient information
-router.get('/patients/:id', async (req, res) => {
+router.get('/:ipsComponent', async (req, res) => {
     try {
-        let { id } = req.params;
-        let patient = (await FhirApi({ url: `/Patient?id=${id}` })).data;
-        res.json({ status: "success", results: patient, crossBorderId: patient.id });
+        let { ipsComponent } = req.params;
+        let { crossBorderId } = req.query;
+        ipsComponent = String(ipsComponent).charAt(0).toUpperCase() + ipsComponent.slice(1)
+        let patient = getPatientByCrossBorderId(String(crossBorderId))
+        // let patient = (await FhirApi({ url: `/Patient?id=${id}` })).data;
+        // res.json({ status: "success", results: patient, crossBorderId: patient.id });
         return;
     } catch (error) {
         res.statusCode = 400;
@@ -22,11 +26,17 @@ router.get('/patients/:id', async (req, res) => {
 })
 
 // modify patient details
-router.post('/patients/:id', async (req, res) => {
+router.post('/:ipsComponent', async (req, res) => {
     try {
-        let data = req.body;
-        let patient = (await FhirApi({ url: '/Patient', data, method: 'PUT' })).data;
-        res.json({ status: "success", results: patient, crossBorderId: patient.id });
+        let { ipsComponent } = req.params;
+        let { crossBorderId } = req.query;
+        let patient = getPatientByCrossBorderId(String(crossBorderId))
+
+        ipsComponent = String(ipsComponent).charAt(0).toUpperCase() + ipsComponent.slice(1)
+
+        let data
+        console.log(ipsComponent)
+        // res.json({ status: "success", results: patient, crossBorderId: patient.id });
         return;
     } catch (error) {
         res.statusCode = 400;
