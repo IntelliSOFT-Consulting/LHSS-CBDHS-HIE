@@ -115,17 +115,6 @@ export const FhirApi = async (params: any) => {
     }
 }
 
-// Sample Patient Object.
-// Create Patient in the MPI
-
-// required
-
-// patient id, patient name
-
-
-// Sample Observation Object For Dynamic Building
-
-// Sample Encounter Object For Dynamic Building
 
 export const parseIdentifiers = async (patientId: string) => {
     let patient: any = (await FhirApi({ url: `/Patient?identifier=${patientId}`, })).data
@@ -141,24 +130,6 @@ export const parseIdentifiers = async (patientId: string) => {
 }
 
 
-
-export const getPatientSummary = async (crossBorderId: string) => {
-    try {
-        let patient = (await FhirApi({ url: `/Patient?identifier=${crossBorderId}`, })).data
-        console.log(patient);
-        // if(patient.entry.length )
-        let identifiers = patient.entry[0].resource.identifier;
-        identifiers = identifiers.map((id: any) => {
-            return {
-                [id.id]: id
-            }
-        })
-        return parseFhirPatient(patient.entry[0].resource)
-    } catch (error) {
-        console.log(error);
-        return null
-    }
-}
 
 
 
@@ -213,6 +184,19 @@ const genClientPassword = async (password: string) => {
             "passwordHash": passwordHash
         })
     })
+}
+
+
+export const getPatientSummary = async (crossBorderId: string) => {
+    try {
+        let patient = await getPatientByCrossBorderId(crossBorderId)
+        console.log(patient);
+        let ips = (await FhirApi({ url: `/Patient/${patient.id}/$summary` })).data;
+        return ips;
+    } catch (error) {
+        console.log(error);
+        return null
+    }
 }
 
 
