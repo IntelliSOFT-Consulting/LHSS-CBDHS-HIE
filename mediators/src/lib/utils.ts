@@ -3,6 +3,7 @@ import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
 import fhirMediatorConfig from '../config/fhirMediatorConfig.json';
 import advancedSearchConfig from '../config/advancedSearchConfig.json';
+
 import { parseFhirPatient } from './resources';
 
 import { Agent } from 'https';
@@ -12,10 +13,6 @@ import * as crypto from 'crypto';
 import { RequestInfo, RequestInit } from 'node-fetch';
 import { uuid } from 'uuidv4';
 
-
-// const ipsComponents = {
-//     ""
-// }
 
 // mediators to be registered
 const mediators = [
@@ -82,6 +79,7 @@ export const installChannels = async () => {
 }
 
 export let apiHost = process.env.FHIR_BASE_URL
+console.log(apiHost)
 
 
 // a fetch wrapper for HAPI FHIR server.

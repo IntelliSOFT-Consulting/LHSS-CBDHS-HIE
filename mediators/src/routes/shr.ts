@@ -1,5 +1,5 @@
 import express from 'express';
-import { _supportedResources } from '../lib/resources';
+import { generatePatientReference, _supportedResources } from '../lib/resources';
 import { FhirApi, getPatientByCrossBorderId } from '../lib/utils';
 import { validateResource } from '../lib/validate';
 
@@ -10,17 +10,23 @@ router.use(express.json());
 
 
 // get patient information
-router.get('/:ipsComponent', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        let { ipsComponent } = req.params;
-        let { crossBorderId } = req.query;
+        let { crossBorderId, type } = req.query;
+        if (!type) {
+            res.statusCode = 400;
+            res.json({ status: "error", error: `resource type is required` });
+            return;
+        }
+        let ipsComponent = type;
         if (!crossBorderId) {
             res.statusCode = 400;
             res.json({ status: "error", error: `Patient crossBorderId is required` });
             return;
         }
-        ipsComponent = String(ipsComponent).charAt(0).toUpperCase() + ipsComponent.slice(1);
+        ipsComponent = String(ipsComponent).charAt(0).toUpperCase() + String(ipsComponent).slice(1);
         let patient = await getPatientByCrossBorderId(String(crossBorderId));
+        console.log(patient)
         if (!patient) {
             res.json({ status: "error", error: `Cross Border Patient with the id ${crossBorderId} not found` });
             return;
@@ -38,13 +44,16 @@ router.get('/:ipsComponent', async (req, res) => {
 })
 
 // modify patient details
-router.post('/:ipsComponent', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
-        let { ipsComponent } = req.params;
-        if (_supportedResources.indexOf(ipsComponent) < 0) {
-            res.json({ status: "error", error: `IPS Component not supported` });
+        let resource = req.body;
+        if (['Observation', 'Medication', 'Immunization', 'AllergyIntolerance', 'MedicationRequest'].indexOf(resource.resourceType) < 0) {
+            res.statusCode = 400;
+            res.json({ status: "error", error: `Invalid or unsupported FHIR Resource` });
             return;
         }
+        let ipsComponent = resource.resourceType;
+
         let { crossBorderId } = req.query;
         if (!crossBorderId) {
             res.statusCode = 400;
@@ -57,9 +66,16 @@ router.post('/:ipsComponent', async (req, res) => {
             return;
         }
 
-        ipsComponent = String(ipsComponent).charAt(0).toUpperCase() + ipsComponent.slice(1)
-
         // Parse resources
+        if (resource.subject) {
+            resource.subject = generatePatientReference("Patient", patient.id);
+        }
+        if (resource.patient) {
+            resource.patient = generatePatientReference("Patient", patient.id);
+        }
+        if (resource.reference) {
+            resource.reference = generatePatientReference("Patient", patient.id);
+        }
 
 
         // Build resources
@@ -70,11 +86,17 @@ router.post('/:ipsComponent', async (req, res) => {
 
         // Post resource
 
-        let data = await FhirApi({ url: `/${ipsComponent}`, method: 'POST' })
-        console.log(ipsComponent)
-        // res.json({ status: "success", results: patient, crossBorderId: patient.id });
+        let data = await FhirApi({ url: `/${resource.resourceType}`, method: 'POST', data: JSON.stringify(resource) })
+        if (["Unprocessable Entity", "Bad Request"].indexOf(data.statusText) > 0) {
+            res.statusCode = 400;
+            res.json({ status: "error", error: data.statusText, data: data.data.issue });
+            return;
+        }
+        console.log(data);
+        res.json({ status: "success", patient: crossBorderId, patientResource: `Patient/${patient.id}`, resource: `${resource.resourceType}/${data.data.id}` });
         return;
     } catch (error) {
+        console.log(error);
         res.statusCode = 400;
         res.json({ status: "error", error });
         return;
