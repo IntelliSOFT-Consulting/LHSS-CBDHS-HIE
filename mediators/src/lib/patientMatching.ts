@@ -62,7 +62,7 @@ export const getDuplicateGoldenRecords = async (count: number) => {
     return duplicates;
 }
 
-getDuplicateGoldenRecords(10)
+// getDuplicateGoldenRecords(10)
 
 export const mergeRecords = async (from: string, to: string) => {
     let res = await FhirApi({

@@ -1,18 +1,18 @@
 {
-  "urn": "urn:mediator:shr_push",
+  "urn": "urn:mediator:shr",
   "version": "1.0.0",
   "name": "CBDHS SHR Mediator",
   "description": "This mediator is responsible for handling SHR bound requests.",
   "defaultChannelConfig": [
     {
-      "name": "CBDHS SHR Mediator Channel",
+      "name": "CBDHS SHR Channel",
       "urlPattern": "/shr",
       "routes": [
         {
           "name": "SHR Route",
           "host": "mediators",
-          "path": "/",
-          "port": "8082",
+          "path": "/shr",
+          "port": "3000",
           "primary": true,
           "type": "http"
         }
@@ -24,10 +24,10 @@
   ],
   "endpoints": [
     {
-      "name": "Get Patient Records",
+      "name": "SHR Mediator Endpoint",
       "host": "mediators",
-      "path": "/",
-      "port": "8082",
+      "path": "/shr",
+      "port": "3000",
       "primary": true,
       "type": "http"
     }
