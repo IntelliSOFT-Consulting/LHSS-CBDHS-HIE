@@ -8,8 +8,6 @@ networks:
 services:
     mongo:
         container_name: openhim-mongo
-        ports:
-            - "27017:27017"
         image: mongo:4.0
         networks:
             - openhim
@@ -109,6 +107,7 @@ services:
             - mediators/.env
             
     dhis2-db:
+        container_name: dhis2-db
         image: mdillon/postgis:10-alpine
         command: postgres -c max_locks_per_transaction=100
         environment:
@@ -117,6 +116,7 @@ services:
             POSTGRES_PASSWORD: dhis
 
     dhis2-web:
+        container_name: dhis2-web
         image: dhis2/core:2.33.0
         volumes:
             - ./dhis.conf:/DHIS2_home/dhis.conf
@@ -124,6 +124,21 @@ services:
             - '8085:8080'
         depends_on:
             - dhis2-db
+
+    hie-admin:
+        container_name: hie-admin
+        build:
+            context: admin
+            dockerfile: Dockerfile.dev
+        volumes:
+            - ./admin:/app/admin
+        networks:
+            - openhim
+            - mediators
+        ports:
+            - "8088:3000"
+        env_file:
+            - admin/.env
 
 volumes:
     mongodb-data:

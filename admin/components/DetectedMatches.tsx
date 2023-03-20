@@ -5,7 +5,7 @@ import { parseFhirPatient } from "../lib/utils";
 import DataTable from "./DataTable";
 
 export default function DetectedMatches() {
-  const url = "http://hiedhs.intellisoftkenya.com:8082/matching?operation=findPossibleMatches";
+  const url = "http://localhost:8082/matching?operation=findPossibleMatches";
   let [patientList, setPatientList] = useState([]);
 
   let getData = async () => {
@@ -17,7 +17,7 @@ export default function DetectedMatches() {
         },
       })
     ).json();
-    console.log(data);
+    // console.log(data);
     data = data.possibleMatches;
     let _p = [];
     setPatientList(data);

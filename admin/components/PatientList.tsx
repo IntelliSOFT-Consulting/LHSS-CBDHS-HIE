@@ -5,7 +5,7 @@ import { parseFhirPatient } from "../lib/utils";
 import DataTable from "./DataTable";
 
 export default function PatientList() {
-  const url = "http://hiedhs.intellisoftkenya.com:8081/fhir/Patient";
+  const url = "http://localhost:8081/fhir/Patient";
   let [patientList, setPatientList] = useState([]);
 
   let getPatients = async () => {
