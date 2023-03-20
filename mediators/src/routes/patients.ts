@@ -90,6 +90,24 @@ router.get('/search', async (req, res) => {
 });
 
 
+// patient search
+router.get('/summary', async (req, res) => {
+    try {
+        let params = req.query;
+        let crossBorderId = String(params.crossBorderId);
+        let patient = await getPatientByCrossBorderId(crossBorderId);
+        let summary = await FhirApi({ 'url': `/Patient/${patient.id}/$summary` })
+        res.json({ status: "success", summary });
+        return;
+    } catch (error) {
+        console.error(error);
+        res.statusCode = 400;
+        res.json({ status: "error", error });
+        return;
+    }
+});
+
+
 
 //update patient details
 router.put('/', async (req, res) => {

@@ -3,6 +3,8 @@ import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
 import fhirMediatorConfig from '../config/fhirMediatorConfig.json';
 import advancedSearchConfig from '../config/advancedSearchConfig.json';
+import ipsMediator from '../config/ipsMediatorConfig.json';
+
 
 import { parseFhirPatient } from './resources';
 
@@ -19,7 +21,8 @@ const mediators = [
     shrMediatorConfig,
     advancedSearchConfig,
     mpiMediatorConfig,
-    fhirMediatorConfig
+    fhirMediatorConfig,
+    ipsMediator
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
