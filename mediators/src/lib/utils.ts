@@ -1,12 +1,8 @@
 import utils from 'openhim-mediator-utils';
 import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
-import fhirMediatorConfig from '../config/fhirMediatorConfig.json';
 import advancedSearchConfig from '../config/advancedSearchConfig.json';
 import ipsMediator from '../config/ipsMediatorConfig.json';
-
-
-import { parseFhirPatient } from './resources';
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
@@ -21,7 +17,6 @@ const mediators = [
     shrMediatorConfig,
     advancedSearchConfig,
     mpiMediatorConfig,
-    fhirMediatorConfig,
     ipsMediator
 ];
 
@@ -129,10 +124,6 @@ export const parseIdentifiers = async (patientId: string) => {
         }
     })
 }
-
-
-
-
 
 export const sendRequest = async () => {
     let headers = await getOpenHIMToken();
