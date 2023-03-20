@@ -6,12 +6,12 @@
     "defaultChannelConfig": [
         {
             "name": "CBDHS IPS Channel",
-            "urlPattern": "/patients/summary",
+            "urlPattern": "/summary",
             "routes": [
                 {
                     "name": "SHR Summary Route",
                     "host": "mediators",
-                    "path": "/patients/summary",
+                    "path": "/summary",
                     "port": "3000",
                     "primary": true,
                     "type": "http"
@@ -30,7 +30,7 @@
         {
             "name": "SHR Summary Mediator Endpoint",
             "host": "mediators",
-            "path": "/patients/summary",
+            "path": "/summary",
             "port": "3000",
             "primary": true,
             "type": "http"

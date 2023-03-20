@@ -13,6 +13,8 @@ import Patients from './routes/patients'
 import SHR from './routes/shr'
 import Data from './routes/data'
 import Facilities from "./routes/facilities";
+import Summary from "./routes/ips";
+
 // import Reports from './routes/reports'
 
 import { importMediators } from "./lib/utils";
@@ -44,6 +46,8 @@ app.use('/patients', Patients)
 app.use('/shr', SHR)
 app.use('/data', Data)
 app.use('/facilities', Facilities)
+app.use('/summary', Summary)
+
 
 
 

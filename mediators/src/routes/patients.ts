@@ -1,5 +1,5 @@
 import express from 'express';
-import { FhirApi, getPatientByCrossBorderId, generateCrossBorderId } from '../lib/utils';
+import { FhirApi, getPatientByCrossBorderId, generateCrossBorderId, getPatientSummary } from '../lib/utils';
 import { parseFhirPatient, Patient } from '../lib/resources';
 
 export const router = express.Router();
@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
     try {
         let { id } = req.query;
         if (!id) {
+            res.statusCode = 400;
             res.json({ status: "error", error: "CrossBorder ID is required" });
             return;
         }
@@ -94,9 +95,7 @@ router.get('/search', async (req, res) => {
 router.get('/summary', async (req, res) => {
     try {
         let params = req.query;
-        let crossBorderId = String(params.crossBorderId);
-        let patient = await getPatientByCrossBorderId(crossBorderId);
-        let summary = await FhirApi({ 'url': `/Patient/${patient.id}/$summary` })
+        let summary = await getPatientSummary(String(params.crossBorderId));
         res.json({ status: "success", summary });
         return;
     } catch (error) {
