@@ -17,7 +17,7 @@ const mediators = [
     shrMediatorConfig,
     advancedSearchConfig,
     mpiMediatorConfig,
-    ipsMediator
+    ipsMediator,
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
@@ -266,4 +266,24 @@ export const parseMedication = async (data: any) => {
         console.log(error);
         return null;
     }
+}
+
+
+export const parseFHIRBundle = async (params: any) => {
+    try {
+        // return {}
+    } catch (error) {
+        return null
+    }
+
+}
+
+
+export const generateFHIRBundle = async (params: any) => {
+    try {
+
+    } catch (error) {
+        return null
+    }
+
 }

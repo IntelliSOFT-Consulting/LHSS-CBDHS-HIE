@@ -6,12 +6,12 @@
   "defaultChannelConfig": [
     {
       "name": "CBDHS SHR Channel",
-      "urlPattern": "/shr",
+      "urlPattern": "^/shr/.*$",
       "routes": [
         {
           "name": "SHR Route",
           "host": "mediators",
-          "path": "/shr",
+          "pathTransform": "s/\/\/.*$/",
           "port": "3000",
           "primary": true,
           "type": "http"

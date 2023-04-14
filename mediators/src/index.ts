@@ -42,7 +42,7 @@ app.use((req, res, next) => {
 app.use('/', Index)
 app.use('/matching', Matching)
 app.use('/auth', Auth)
-app.use('/patients', Patients)
+app.use('/Patient', Patients)
 app.use('/shr', SHR)
 app.use('/data', Data)
 app.use('/facilities', Facilities)

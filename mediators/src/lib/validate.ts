@@ -16,6 +16,11 @@ export const getConceptCode = async (code: string) => {
 
 
 // getMappings
+export const getMappings =async (code:string) => {
+    
+}
+
+
 
 // 1. Validates concepts
 export const validateResource = async (data: any) => {

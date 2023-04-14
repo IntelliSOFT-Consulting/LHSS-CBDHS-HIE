@@ -1,0 +1,699 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dhis2-web
+  name: dhis2-web
+spec:
+  ports:
+    - name: "8085"
+      port: 8085
+      targetPort: 8080
+  selector:
+    io.kompose.service: dhis2-web
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: hapi-fhir-jpa
+  name: hapi-fhir-jpa
+spec:
+  ports:
+    - name: "8081"
+      port: 8081
+      targetPort: 8080
+  selector:
+    io.kompose.service: hapi-fhir-jpa
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mediators
+  name: mediators
+spec:
+  ports:
+    - name: "8082"
+      port: 8082
+      targetPort: 3000
+  selector:
+    io.kompose.service: mediators
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: openhim-console
+  name: openhim-console
+spec:
+  ports:
+    - name: "9000"
+      port: 9000
+      targetPort: 80
+  selector:
+    io.kompose.service: openhim-console
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: openhim-core
+  name: openhim-core
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+    - name: "5000"
+      port: 5000
+      targetPort: 5000
+    - name: "5001"
+      port: 5001
+      targetPort: 5001
+    - name: "5050"
+      port: 5050
+      targetPort: 5050
+    - name: "5051"
+      port: 5051
+      targetPort: 5051
+    - name: "5052"
+      port: 5052
+      targetPort: 5052
+    - name: "7788"
+      port: 7788
+      targetPort: 7788
+  selector:
+    io.kompose.service: openhim-core
+status:
+  loadBalancer: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dhis2-db
+  name: dhis2-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: dhis2-db
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-default: "true"
+        io.kompose.service: dhis2-db
+    spec:
+      containers:
+        - args:
+            - postgres
+            - -c
+            - max_locks_per_transaction=100
+          env:
+            - name: POSTGRES_DB
+              value: dhis2
+            - name: POSTGRES_PASSWORD
+              value: dhis
+            - name: POSTGRES_USER
+              value: dhis
+          image: mdillon/postgis:10-alpine
+          name: dhis2-db
+          resources: {}
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: null
+  name: lhss-cbdhs-hie-default
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.network/lhss-cbdhs-hie-default: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/lhss-cbdhs-hie-default: "true"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dhis2-web
+  name: dhis2-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: dhis2-web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-default: "true"
+        io.kompose.service: dhis2-web
+    spec:
+      containers:
+        - image: dhis2/core:2.33.0
+          name: dhis2-web
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            - mountPath: /DHIS2_home/dhis.conf
+              name: dhis2-web-claim0
+      restartPolicy: Always
+      volumes:
+        - name: dhis2-web-claim0
+          persistentVolumeClaim:
+            claimName: dhis2-web-claim0
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dhis2-web-claim0
+  name: dhis2-web-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.network/lhss-cbdhs-hie-hapi-fhir: "true"
+    io.kompose.service: hapi-fhir-jpa
+  name: hapi-fhir-jpa
+spec:
+  containers:
+    - env:
+        - name: SPRING_CONFIG_LOCATION
+          value: /hapi/application.yaml
+      image: intellisoftkenya/hapi-fhir:latest
+      name: hapi-fhir-jpa
+      ports:
+        - containerPort: 8080
+      resources: {}
+      volumeMounts:
+        - mountPath: /hapi
+          name: hapi-fhir-jpa-claim0
+  restartPolicy: OnFailure
+  volumes:
+    - name: hapi-fhir-jpa-claim0
+      persistentVolumeClaim:
+        claimName: hapi-fhir-jpa-claim0
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: hapi-fhir-jpa-claim0
+  name: hapi-fhir-jpa-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: null
+  name: lhss-cbdhs-hie-hapi-fhir
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.network/lhss-cbdhs-hie-hapi-fhir: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/lhss-cbdhs-hie-hapi-fhir: "true"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: hapi-fhir-postgres
+  name: hapi-fhir-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: hapi-fhir-postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-hapi-fhir: "true"
+        io.kompose.service: hapi-fhir-postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: hapi
+            - name: POSTGRES_PASSWORD
+              value: hapi123
+            - name: POSTGRES_USER
+              value: postgres
+          image: postgres:14-alpine
+          name: hapi-fhir-postgres
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: hapi-fhir-postgres
+      restartPolicy: Always
+      volumes:
+        - name: hapi-fhir-postgres
+          persistentVolumeClaim:
+            claimName: hapi-fhir-postgres
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: hapi-fhir-postgres
+  name: hapi-fhir-postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mediators
+  name: mediators
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mediators
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-hapi-fhir: "true"
+        io.kompose.network/lhss-cbdhs-hie-openhim: "true"
+        io.kompose.service: mediators
+    spec:
+      containers:
+        - env:
+            - name: FHIR_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: FHIR_BASE_URL
+                  name: mediators--env
+            - name: OCL_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: OCL_API_KEY
+                  name: mediators--env
+            - name: OCL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: OCL_HOST
+                  name: mediators--env
+            - name: OPENHIM_API_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: OPENHIM_API_URL
+                  name: mediators--env
+            - name: OPENHIM_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: OPENHIM_PASSWORD
+                  name: mediators--env
+            - name: OPENHIM_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: OPENHIM_USERNAME
+                  name: mediators--env
+            - name: WEB_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: WEB_URL
+                  name: mediators--env
+          image: mediators
+          name: mediators
+          ports:
+            - containerPort: 3000
+          resources: {}
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: v1
+data:
+  FHIR_BASE_URL: http://hapi-fhir-jpa:8080/fhir
+  OCL_API_KEY: 4fc790a2b4ac7f6990e3071b92dd4bf60e44c346
+  OCL_HOST: https://api.openconceptlab.org
+  OPENHIM_API_URL: https://openhim-core:8080
+  OPENHIM_PASSWORD: password
+  OPENHIM_USERNAME: root@openhim.org
+  WEB_URL: http://localhost:3000
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mediators-mediators--env
+  name: mediators--env
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: null
+  name: lhss-cbdhs-hie-openhim
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.network/lhss-cbdhs-hie-openhim: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/lhss-cbdhs-hie-openhim: "true"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mongo
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mongo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-openhim: "true"
+        io.kompose.service: mongo
+    spec:
+      containers:
+        - image: mongo:4.0
+          name: openhim-mongo
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongodb-data
+      restartPolicy: Always
+      volumes:
+        - name: mongodb-data
+          persistentVolumeClaim:
+            claimName: mongodb-data
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: mongodb-data
+  name: mongodb-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: openhim-console
+  name: openhim-console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: openhim-console
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-openhim: "true"
+        io.kompose.service: openhim-console
+    spec:
+      containers:
+        - image: jembi/openhim-console:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl -sS http://openhim-console || exit 1
+            failureThreshold: 3
+            periodSeconds: 30
+            timeoutSeconds: 30
+          name: openhim-console
+          ports:
+            - containerPort: 80
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html/config/default.json
+              name: openhim-console-claim0
+            - mountPath: /etc/nginx/certs
+              name: openhim-console-claim1
+      restartPolicy: Always
+      volumes:
+        - name: openhim-console-claim0
+          persistentVolumeClaim:
+            claimName: openhim-console-claim0
+        - name: openhim-console-claim1
+          persistentVolumeClaim:
+            claimName: openhim-console-claim1
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: openhim-console-claim0
+  name: openhim-console-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: openhim-console-claim1
+  name: openhim-console-claim1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --out gen
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: openhim-core
+  name: openhim-core
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: openhim-core
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert --out gen
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lhss-cbdhs-hie-hapi-fhir: "true"
+        io.kompose.network/lhss-cbdhs-hie-mediators: "true"
+        io.kompose.network/lhss-cbdhs-hie-openhim: "true"
+        io.kompose.service: openhim-core
+    spec:
+      containers:
+        - env:
+            - name: authentication_enableJWTAuthentication
+              value: "true"
+            - name: mongo_atnaUrl
+              value: mongodb://mongo/openhim
+            - name: mongo_url
+              value: mongodb://mongo/openhim
+          image: jembi/openhim-core:latest
+          livenessProbe:
+            exec:
+              command:
+                - curl -sSk https://openhim-core:8080/heartbeat || exit 1
+            failureThreshold: 3
+            periodSeconds: 30
+            timeoutSeconds: 30
+          name: openhim-core
+          ports:
+            - containerPort: 8080
+            - containerPort: 5000
+            - containerPort: 5001
+            - containerPort: 5050
+            - containerPort: 5051
+            - containerPort: 5052
+            - containerPort: 7788
+          resources: {}
+      restartPolicy: Always
+status: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  creationTimestamp: null
+  name: lhss-cbdhs-hie-mediators
+spec:
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.network/lhss-cbdhs-hie-mediators: "true"
+  podSelector:
+    matchLabels:
+      io.kompose.network/lhss-cbdhs-hie-mediators: "true"
+

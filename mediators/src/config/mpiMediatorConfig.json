@@ -6,12 +6,12 @@
   "defaultChannelConfig": [
     {
       "name": "CBDHS MPI Mediator Channel",
-      "urlPattern": "/patients",
+      "urlPattern": "/Patient",
       "routes": [
         {
           "name": "MPI Route",
           "host": "mediators",
-          "path": "/patients",
+          "path": "/Patient",
           "port": "3000",
           "primary": true,
           "type": "http",
@@ -33,7 +33,7 @@
     {
       "name": "Patient CRUD Endpoints",
       "host": "mediators",
-      "path": "/patients",
+      "path": "/Patient",
       "port": "3000",
       "primary": true,
       "type": "http"
