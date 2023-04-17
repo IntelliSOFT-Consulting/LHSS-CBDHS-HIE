@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
             res.json({ status: "error", error: "CrossBorder ID is required" });
             return;
         }
-        
+
         let patient = (await FhirApi({ url: `/Patient?identifier=${id}` })).data;
         if (patient?.total > 0 || patient?.entry?.length > 0) {
             patient = patient.entry[0].resource;
@@ -78,6 +78,7 @@ router.get('/search', async (req, res) => {
             url: `/Patient${params?.name ? `?name=${params?.name}` : ""}${(params?.nationalId || params?.crossBorderId) ? `?identifier=${(params?.nationalId) || params?.crossBorderId}` : ''}`
         })).data;
         console.log(patients);
+        patients = patients.entry || [];
         patients = patients.map((patient: any) => {
             return patient.resource;
         })
