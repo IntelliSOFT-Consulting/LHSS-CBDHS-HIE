@@ -77,12 +77,12 @@ router.get('/search', async (req, res) => {
         let patients = (await FhirApi({
             url: `/Patient${params?.name ? `?name=${params?.name}` : ""}${(params?.nationalId || params?.crossBorderId) ? `?identifier=${(params?.nationalId) || params?.crossBorderId}` : ''}`
         })).data;
-        console.log(patients);
-        patients = patients.entry || [];
-        patients = patients.map((patient: any) => {
-            return patient.resource;
-        })
-        res.json({ status: "success", results: patients, count: patients.length });
+        // console.log(patients);
+        // patients = patients.entry || [];
+        // patients = patients.map((patient: any) => {
+        //     return patient.resource;
+        // })
+        res.json(patients);
         return;
     } catch (error) {
         console.error(error);
