@@ -56,16 +56,27 @@ router.post('/', async (req, res) => {
             method: 'POST'
         })).data;
         if (patient.id) {
-            res.json({ status: "success", crossBorderId });
+            res.statusCode = 200;
+            res.json(patient);
             return;
         }
         res.statusCode = 400;
-        res.json({ status: "error", error: "Failed to register patient" });
+        res.json(patient);
         return;
     } catch (error) {
         res.statusCode = 400;
         console.log(error);
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": "Failed to register patient. Check the resource and try again"
+                }
+            }]
+        });
         return;
     }
 });
@@ -87,7 +98,17 @@ router.get('/search', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.statusCode = 400;
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `Patient not found - ${JSON.stringify(error)}`
+                }
+            }]
+        });
         return;
     }
 });
@@ -103,7 +124,17 @@ router.get('/summary', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.statusCode = 400;
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `Failed to generate IPS Summary - ${JSON.stringify(error)}`
+                }
+            }]
+        });
         return;
     }
 });
@@ -125,14 +156,34 @@ router.put('/', async (req, res) => {
         if (!parsedPatient) {
             let error = "Invalid Patient resource - failed to parse resource"
             res.statusCode = 400;
-            res.json({ status: "error", error });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error",
+                    "code": "exception",
+                    "details": {
+                        "text": `Invalid Patient resource - ${JSON.stringify(error)}`
+                    }
+                }]
+            });
             return;
         }
         let patient = await getPatientByCrossBorderId(String(crossBorderId) || '')
         if (!patient) {
             let error = "Invalid crossBorderId provided"
             res.statusCode = 400;
-            res.json({ status: "error", error });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error",
+                    "code": "exception",
+                    "details": {
+                        "text": `Patient not found - ${JSON.stringify(error)}`
+                    }
+                }]
+            });;
             return;
         }
         let fhirId = patient.id;
@@ -143,12 +194,22 @@ router.put('/', async (req, res) => {
         }))
         console.log(updatedPatient)
         res.statusCode = 200;
-        res.json({ status: "success", patient: updatedPatient.data });
+        res.json(updatedPatient.data);
         return;
     } catch (error) {
         console.error(error);
         res.statusCode = 400;
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `Failed to update patient- ${JSON.stringify(error)}`
+                }
+            }]
+        });
         return;
     }
 });
