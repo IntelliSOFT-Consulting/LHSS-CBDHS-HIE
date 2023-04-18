@@ -13,7 +13,17 @@ router.get('/', async (req, res) => {
         let { id, crossBorderId } = req.query;
         if (!id && (!(crossBorderId))) {
             res.statusCode = 400;
-            res.json({ status: "error", error: "CrossBorder ID is required" });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error",
+                    "code": "exception",
+                    "details": {
+                        "text": "Failed to register patient. CrossBorder ID is required"
+                    }
+                }]
+            });
             return;
         }
 
@@ -25,12 +35,32 @@ router.get('/', async (req, res) => {
             return;
         }
         res.statusCode = 404;
-        res.json({ status: "error", "error": "CrossBorder patient not found" });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": "Failed to register patient. CrossBorder patient not found"
+                }
+            }]
+        });
         return;
     } catch (error) {
         res.statusCode = 400;
         console.log(error);
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error",
+                "code": "exception",
+                "details": {
+                    "text": `Failed to register patient. ${JSON.stringify(error)}`
+                }
+            }]
+        });
         return;
     }
 })
@@ -45,7 +75,17 @@ router.post('/', async (req, res) => {
             let error = "Invalid Patient resource - failed to parse resource";
             res.statusCode = 400;
             console.log(error);
-            res.json({ status: "error", error });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error",
+                    "code": "exception",
+                    "details": {
+                        "text": `Failed to register patient. ${JSON.stringify(error)}`
+                    }
+                }]
+            });
             return;
         }
         console.log(parsedPatient);
@@ -119,7 +159,7 @@ router.get('/summary', async (req, res) => {
     try {
         let params = req.query;
         let summary = await getPatientSummary(String(params.crossBorderId));
-        res.json({ status: "success", summary });
+        res.json(summary);
         return;
     } catch (error) {
         console.error(error);
@@ -149,7 +189,17 @@ router.put('/', async (req, res) => {
         if (!crossBorderId) {
             let error = "crossBorderId is a required parameter"
             res.statusCode = 400;
-            res.json({ status: "error", error });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error",
+                    "code": "exception",
+                    "details": {
+                        "text": `Failed to register patient. ${JSON.stringify(error)}`
+                    }
+                }]
+            });
             return;
         }
         let parsedPatient = parseFhirPatient(data);
