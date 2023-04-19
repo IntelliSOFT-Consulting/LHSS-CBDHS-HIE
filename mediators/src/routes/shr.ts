@@ -80,41 +80,6 @@ router.post('/:resourceType', async (req, res) => {
             });
             return;
         }
-        if (resource.resourceType === "Bundle") {
-            resource.entry.map(async (item: any) => {
-                let patient = await getPatientByCrossBorderId(String(crossBorderId));
-                let error = `Cross Border Patient with the id ${crossBorderId} not found`;
-                if (!patient) {
-                    res.json({
-                        "resourceType": "OperationOutcome",
-                        "id": "exception",
-                        "issue": [{
-                            "severity": "error", "code": "exception", "details": { "text": error }
-                        }]
-                    });
-                    return;
-                }
-                if (item.subject) {
-                    item.subject = await generatePatientReference("Patient", patient.id);
-                }
-                if (item.patient) {
-                    item.patient = await generatePatientReference("Patient", patient.id);
-                }
-                if (item.reference) {
-                    item.reference = await generatePatientReference("Patient", patient.id);
-                }
-
-            });
-
-            let data = await FhirApi({ url: `/`, method: 'POST', data: JSON.stringify(resource) });
-            if (["Unprocessable Entity", "Bad Request"].indexOf(data.statusText) > 0) {
-                res.statusCode = 400;
-                res.json(data.data);
-                return;
-            }
-            res.json(data.data);
-            return;
-        }
         let patient = await getPatientByCrossBorderId(String(crossBorderId));
         let error = `Cross Border Patient with the id ${crossBorderId} not found`
         if (!patient) {
