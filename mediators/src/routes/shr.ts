@@ -54,37 +54,56 @@ router.post('/:resourceType', async (req, res) => {
         let { resourceType } = req.params;
         if (supportedResources.indexOf(resourceType) < 0) {
             res.statusCode = 400;
-            res.json({ status: "error", error: `Invalid or unsupported FHIR Resource` });
+            let error = `Invalid or unsupported FHIR Resource`;
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception",
+                    "details": { "text": error }
+                }]
+            });
             return;
         }
-        let ipsComponent = resource.resourceType;
 
         let { crossBorderId } = req.query;
         if (!crossBorderId) {
             res.statusCode = 400;
-            res.json({ status: "error", error: `Patient crossBorderId is required` });
+            let error = `Patient crossBorderId is required`;
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception",
+                    "details": { "text": error }
+                }]
+            });
             return;
         }
         let patient = await getPatientByCrossBorderId(String(crossBorderId));
+        let error = `Cross Border Patient with the id ${crossBorderId} not found`
         if (!patient) {
-            res.json({ status: "error", error: `Cross Border Patient with the id ${crossBorderId} not found` });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception", "details": { "text": error }
+                }]
+            });
             return;
         }
 
         // Parse resources
         if (resource.subject) {
-            resource.subject = generatePatientReference("Patient", patient.id);
+            resource.subject = await generatePatientReference("Patient", patient.id);
         }
         if (resource.patient) {
-            resource.patient = generatePatientReference("Patient", patient.id);
+            resource.patient = await generatePatientReference("Patient", patient.id);
         }
         if (resource.reference) {
-            resource.reference = generatePatientReference("Patient", patient.id);
+            resource.reference = await generatePatientReference("Patient", patient.id);
         }
-
-
         // Build resources
-
 
         // To-do: Hydrate resources
 
@@ -103,7 +122,13 @@ router.post('/:resourceType', async (req, res) => {
         return;
     } catch (error) {
         res.statusCode = 400;
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error", "code": "exception", "details": { "text": error }
+            }]
+        });
         return;
     }
 })
@@ -113,11 +138,11 @@ router.post('/:resourceType', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         let resource = req.body;
-        if (supportedResources.indexOf(resource.resourceType) < 0) {
-            res.statusCode = 400;
-            res.json({ status: "error", error: `Invalid or unsupported FHIR Resource` });
-            return;
-        }
+        // if (supportedResources.indexOf(resource.resourceType) < 0) {
+        //     res.statusCode = 400;
+        //     res.json({ status: "error", error: `Invalid or unsupported FHIR Resource` });
+        //     return;
+        // }
         let ipsComponent = resource.resourceType;
 
         let { crossBorderId } = req.query;
@@ -143,23 +168,14 @@ router.post('/', async (req, res) => {
             resource.reference = generatePatientReference("Patient", patient.id);
         }
 
+        // Post FHIR Bundle
 
-        // Build resources
-
-
-        // To-do: Hydrate resources
-
-
-        // Post resource
-
-        let data = await FhirApi({ url: `/${resource.resourceType}`, method: 'POST', data: JSON.stringify(resource) })
+        let data = await FhirApi({ url: `/`, method: 'POST', data: JSON.stringify(resource) })
         if (["Unprocessable Entity", "Bad Request"].indexOf(data.statusText) > 0) {
             res.statusCode = 400;
             res.json(data.data);
             return;
         }
-        // console.log(data);
-        // res.json({ status: "success", patient: crossBorderId, patientResource: `Patient/${patient.id}`, resource: `${resource.resourceType}/${data.data.id}` });
         res.json(data.data);
         return;
     } catch (error) {
