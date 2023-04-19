@@ -17,31 +17,58 @@ router.get('/', async (req, res) => {
         let { crossBorderId, type } = req.query;
         if (!type) {
             res.statusCode = 400;
-            res.json({ status: "error", error: `resource type is required` });
+            let error = `resource type is required`;
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception", "details": { "text": error }
+                }]
+            });
             return;
         }
         let ipsComponent = type;
         if (!crossBorderId) {
             res.statusCode = 400;
-            res.json({ status: "error", error: `Patient crossBorderId is required` });
+            let error = `Patient crossBorderId is required`;
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception", "details": { "text": error }
+                }]
+            });
             return;
         }
         ipsComponent = String(ipsComponent).charAt(0).toUpperCase() + String(ipsComponent).slice(1);
         let patient = await getPatientByCrossBorderId(String(crossBorderId));
         console.log(patient);
         if (!patient) {
-            res.json({ status: "error", error: `Cross Border Patient with the id ${crossBorderId} not found` });
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception", "details": { "text": `Cross Border Patient with the id ${crossBorderId} not found` }
+                }]
+            });
             return;
         }
 
         // MDM Expansion - search across all linked resources.
         let data = await (await FhirApi({ url: `/${ipsComponent}?patient=Patient/${patient.id}` })).data;
         console.log(data);
-        res.json({ status: "success", [ipsComponent]: data });
+        res.json(data);
         return
     } catch (error) {
         res.statusCode = 400;
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error", "code": "exception",
+                "details": { "text": error }
+            }]
+        });
         return;
     }
 })
@@ -141,13 +168,21 @@ router.post('/', async (req, res) => {
         let { crossBorderId } = req.query;
         if (!crossBorderId) {
             res.statusCode = 400;
-            res.json({ status: "error", error: `Patient crossBorderId is required` });
+            let error = `Patient crossBorderId is required`;
+            res.json({
+                "resourceType": "OperationOutcome",
+                "id": "exception",
+                "issue": [{
+                    "severity": "error", "code": "exception",
+                    "details": { "text": error }
+                }]
+            });
             return;
         }
         if (resource.resourceType === "Bundle") {
             resource.entry.map(async (item: any) => {
                 let patient = await getPatientByCrossBorderId(String(crossBorderId));
-                let error = `Cross Border Patient with the id ${crossBorderId} not found`;
+                let error = `CrossBorder Patient with the id ${crossBorderId} not found`;
                 if (!patient) {
                     res.json({
                         "resourceType": "OperationOutcome",
@@ -209,7 +244,13 @@ router.post('/', async (req, res) => {
     } catch (error) {
         console.log(error);
         res.statusCode = 400;
-        res.json({ status: "error", error });
+        res.json({
+            "resourceType": "OperationOutcome",
+            "id": "exception",
+            "issue": [{
+                "severity": "error", "code": "exception", "details": { "text": error }
+            }]
+        });
         return;
     }
 })
