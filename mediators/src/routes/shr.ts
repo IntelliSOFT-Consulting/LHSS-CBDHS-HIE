@@ -12,10 +12,11 @@ router.use(express.json());
 const supportedResources = ['Observation', 'Medication', 'Immunization', 'AllergyIntolerance', 'MedicationRequest', 'Encounter'];
 
 // get patient information
-router.get('/', async (req, res) => {
+router.get('/:resourceType', async (req, res) => {
     try {
-        let { crossBorderId, type } = req.query;
-        if (!type) {
+        let { crossBorderId } = req.query;
+        let {resourceType} = req.params;
+        if (!resourceType) {
             res.statusCode = 400;
             let error = `resource type is required`;
             res.json({
@@ -27,7 +28,7 @@ router.get('/', async (req, res) => {
             });
             return;
         }
-        let ipsComponent = type;
+        let ipsComponent = resourceType;
         if (!crossBorderId) {
             res.statusCode = 400;
             let error = `Patient crossBorderId is required`;
@@ -143,8 +144,7 @@ router.post('/:resourceType', async (req, res) => {
             res.json(data.data);
             return;
         }
-        // console.log(data);
-        // res.json({ status: "success", patient: crossBorderId, patientResource: `Patient/${patient.id}`, resource: `${resource.resourceType}/${data.data.id}` });
+        
         res.json(data.data);
         return;
     } catch (error) {
