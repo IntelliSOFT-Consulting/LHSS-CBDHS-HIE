@@ -11,7 +11,6 @@ import * as crypto from 'crypto';
 import { RequestInfo, RequestInit } from 'node-fetch';
 import { uuid } from 'uuidv4';
 
-
 // mediators to be registered
 const mediators = [
     shrMediatorConfig,
