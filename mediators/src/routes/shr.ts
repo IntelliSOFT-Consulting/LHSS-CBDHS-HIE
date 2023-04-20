@@ -45,6 +45,7 @@ router.get('/:resourceType', async (req, res) => {
         let patient = await getPatientByCrossBorderId(String(crossBorderId));
         console.log(patient);
         if (!patient) {
+            res.statusCode = 404;
             res.json({
                 "resourceType": "OperationOutcome",
                 "id": "exception",
