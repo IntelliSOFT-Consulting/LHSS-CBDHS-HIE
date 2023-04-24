@@ -371,8 +371,8 @@ export const parseFhirPatient = (patient: any) => {
             district: patient.address[0].district || undefined,
             county: patient.address[0].state,
             subCounty: patient.address[0].city,
-            nextOfKinName: patient.contact[0].relationship[0].text,
-            nextOfKinRelationship: patient.contact[0].name.family,
+            nextOfKinRelationship: patient.contact[0].relationship[0].text,
+            nextOfKinName: patient.contact[0].name.family,
             nextOfKinPhone: patient.contact[0].telecom,
         }
     } catch (error) {

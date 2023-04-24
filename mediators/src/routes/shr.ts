@@ -9,7 +9,7 @@ export const router = express.Router();
 router.use(express.json());
 
 
-const supportedResources = ['Observation', 'Medication', 'Immunization', 'AllergyIntolerance', 'MedicationRequest', 'Encounter'];
+const supportedResources = ['Observation', 'Medication', 'Immunization', 'AllergyIntolerance', 'MedicationRequest', 'Encounter', 'Condition'];
 
 // get patient information
 router.get('/:resourceType', async (req, res) => {
