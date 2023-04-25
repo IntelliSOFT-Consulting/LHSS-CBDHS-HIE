@@ -3,6 +3,7 @@ import shrMediatorConfig from '../config/shrMediatorConfig.json';
 import mpiMediatorConfig from '../config/mpiMediatorConfig.json';
 import advancedSearchConfig from '../config/advancedSearchConfig.json';
 import ipsMediator from '../config/ipsMediatorConfig.json';
+import fhirBaseMediator from '../config/fhirBaseConfig.json'
 
 import { Agent } from 'https';
 import * as crypto from 'crypto';
@@ -17,6 +18,7 @@ const mediators = [
     advancedSearchConfig,
     mpiMediatorConfig,
     ipsMediator,
+    fhirBaseMediator
 ];
 
 const fetch = (url: RequestInfo, init?: RequestInit) =>
