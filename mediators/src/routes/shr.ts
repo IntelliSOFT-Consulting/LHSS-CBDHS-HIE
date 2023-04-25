@@ -232,8 +232,6 @@ router.post('/', async (req, res) => {
             resource.reference = generatePatientReference("Patient", patient.id);
         }
 
-        // Post FHIR Bundle
-
         let data = await FhirApi({ url: `/`, method: 'POST', data: JSON.stringify(resource) })
         if (["Unprocessable Entity", "Bad Request"].indexOf(data.statusText) > 0) {
             res.statusCode = 400;
