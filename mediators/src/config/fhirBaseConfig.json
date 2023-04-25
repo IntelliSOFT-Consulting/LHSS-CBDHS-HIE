@@ -1,7 +1,7 @@
 {
-    "urn": "urn:mediator:shr",
+    "urn": "urn:mediator:shr_fhir_base",
     "version": "1.0.0",
-    "name": "FHIR Base Mediator Confog",
+    "name": "FHIR Base Mediator Config",
     "description": "This mediator is responsible for handling SHR bound requests.",
     "defaultChannelConfig": [
       {
@@ -24,7 +24,7 @@
     ],
     "endpoints": [
       {
-        "name": "SHR Mediator Endpoint",
+        "name": "SHR FHIR Base Mediator Endpoint",
         "host": "mediators",
         "path": "/shr",
         "port": "3000",
