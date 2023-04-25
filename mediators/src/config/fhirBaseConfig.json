@@ -5,7 +5,7 @@
     "description": "This mediator is responsible for handling SHR bound requests.",
     "defaultChannelConfig": [
       {
-        "name": "CBDHS SHR Channel",
+        "name": "CBDHS SHR FHIR Base Channel",
         "urlPattern": "/shr",
         "routes": [
           {
