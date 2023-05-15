@@ -1,9 +1,10 @@
 # LHSS CBDHS HIE
 
-This repository contains the code and artefacts for the LHSS CBDHS Health Information Exchange.
+This repository contains the code and artefacts for the LHSS CBDHS Health Information Exchange based on the OpenHIE architecture.
 
-LHSS - Health Systems Strengthening
-CBDHS - CrossBorder Digital Health System
+
+1. LHSS - Local Health Systems Strengthening
+2. CBDHS - CrossBorder Digital Health System
 
 ### Components
 
