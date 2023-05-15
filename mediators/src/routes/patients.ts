@@ -10,8 +10,8 @@ router.use(express.json());
 // get patient information by crossborder ID
 router.get('/', async (req, res) => {
     try {
-        let { id, crossBorderId } = req.query;
-        if (!id && (!(crossBorderId))) {
+        let { id, crossBorderId, identifier } = req.query;
+        if (!id && !identifier && (!(crossBorderId))) {
             res.statusCode = 400;
             res.json({
                 "resourceType": "OperationOutcome",
@@ -20,14 +20,14 @@ router.get('/', async (req, res) => {
                     "severity": "error",
                     "code": "exception",
                     "details": {
-                        "text": "Failed to register patient. CrossBorder ID is required"
+                        "text": "Failed to register patient. CrossBorder ID or identifier is required"
                     }
                 }]
             });
             return;
         }
 
-        let patient = (await FhirApi({ url: `/Patient?identifier=${id}` })).data;
+        let patient = (await FhirApi({ url: `/Patient?identifier=${id || identifier}` })).data;
         if (patient?.total > 0 || patient?.entry?.length > 0) {
             patient = patient.entry[0].resource;
             res.statusCode = 200;
