@@ -1,6 +1,7 @@
 import express from 'express';
 import { FhirApi, getPatientByCrossBorderId, generateCrossBorderId, getPatientSummary } from '../lib/utils';
 import { parseFhirPatient, Patient } from '../lib/resources';
+import { ParsedQs } from 'qs'
 
 export const router = express.Router();
 
@@ -10,6 +11,8 @@ router.use(express.json());
 // get patient information by crossborder ID
 router.get('/', async (req, res) => {
     try {
+        let _queryParams: ParsedQs = req.query;
+        let queryParams: Record<string, any> = { ..._queryParams }
         let { id, crossBorderId, identifier } = req.query;
         if (!id && !identifier && (!(crossBorderId))) {
             res.statusCode = 400;
@@ -26,8 +29,14 @@ router.get('/', async (req, res) => {
             });
             return;
         }
+        // let url = new URL('/Patient')
+        let params = []
+        for (const k of Object.keys(queryParams)) {
+            params.push(`${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`);
+        }
+        console.log(`/Patient?${params.join("&")}`)
 
-        let patient = (await FhirApi({ url: `/Patient?identifier=${id || identifier}` })).data;
+        let patient = (await FhirApi({url: `/Patient?${params.join("&")}`})).data;
         if (patient?.total > 0 || patient?.entry?.length > 0) {
             patient = patient.entry[0].resource;
             res.statusCode = 200;
@@ -82,7 +91,7 @@ router.post('/', async (req, res) => {
                     "severity": "error",
                     "code": "exception",
                     "details": {
-                        "text": `Failed to register patient. ${JSON.stringify(error)}`
+                        "text": `Failed to find patient. ${JSON.stringify(error)}`
                     }
                 }]
             });
@@ -113,7 +122,7 @@ router.post('/', async (req, res) => {
                 "severity": "error",
                 "code": "exception",
                 "details": {
-                    "text": "Failed to register patient. Check the resource and try again"
+                    "text": "Failed to find patient. Check the resource and try again"
                 }
             }]
         });
