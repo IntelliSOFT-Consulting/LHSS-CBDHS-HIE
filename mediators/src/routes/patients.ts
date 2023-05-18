@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
         console.log(`/Patient?${params.join("&")}`)
 
         let patient = (await FhirApi({url: `/Patient?${params.join("&")}`})).data;
-        if (patient?.total > 0 || patient?.entry?.length > 0) {
+        if (patient) {
             // patient = patient.entry[0].resource;
             res.statusCode = 200;
             res.json(patient);
