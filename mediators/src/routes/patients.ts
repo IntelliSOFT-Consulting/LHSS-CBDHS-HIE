@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
         }
         console.log(`/Patient?${params.join("&")}`)
 
-        let patient = (await FhirApi({url: `/Patient?${params.join("&")}`})).data;
+        let patient = (await FhirApi({ url: `/Patient?${params.join("&")}` })).data;
         if (patient) {
             // patient = patient.entry[0].resource;
             res.statusCode = 200;
@@ -79,29 +79,44 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         let data = req.body;
-        let parsedPatient = parseFhirPatient(data);
-        if (!parsedPatient) {
-            let error = "Invalid Patient resource - failed to parse resource";
-            res.statusCode = 400;
-            console.log(error);
-            res.json({
-                "resourceType": "OperationOutcome",
-                "id": "exception",
-                "issue": [{
-                    "severity": "error",
-                    "code": "exception",
-                    "details": {
-                        "text": `Failed to find patient. ${JSON.stringify(error)}`
+        // let parsedPatient = parseFhirPatient(data);
+        // if (!parsedPatient) {
+        //     let error = "Invalid Patient resource - failed to parse resource";
+        //     res.statusCode = 400;
+        //     console.log(error);
+        //     res.json({
+        //         "resourceType": "OperationOutcome",
+        //         "id": "exception",
+        //         "issue": [{
+        //             "severity": "error",
+        //             "code": "exception",
+        //             "details": {
+        //                 "text": `Failed to find patient. ${JSON.stringify(error)}`
+        //             }
+        //         }]
+        //     });
+        //     return;
+        // }
+        let crossBorderId = generateCrossBorderId("Kenya");
+        let sampleCrossborderId = {
+            "id": "09e02f17-5cc7-4bd0-b957-34e4c8b5892b",
+            "use": "usual",
+            "type": {
+                "coding": [
+                    {
+                        "code": "e5e9a994-12e2-42c3-9c02-5abdc0fe40e8"
                     }
-                }]
-            });
-            return;
+                ],
+                "text": "Cross-Border ID"
+            },
+            "system": "urn:oid:2.16.840.1.113883.3.26.1.3",
+            "value": crossBorderId
         }
-        console.log(parsedPatient);
-        let crossBorderId = generateCrossBorderId(parsedPatient?.country);
+        data.identifier.push(sampleCrossborderId)
+        // console.log(parsedPatient);
         let patient = (await FhirApi({
             url: `/Patient`,
-            data: JSON.stringify(Patient({ ...parsedPatient, crossBorderId })),
+            data: JSON.stringify(data),
             method: 'POST'
         })).data;
         if (patient.id) {
