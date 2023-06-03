@@ -14,21 +14,21 @@ router.get('/', async (req, res) => {
         let _queryParams: ParsedQs = req.query;
         let queryParams: Record<string, any> = { ..._queryParams }
         let { id, crossBorderId, identifier } = req.query;
-        if (!id && !identifier && (!(crossBorderId))) {
-            res.statusCode = 400;
-            res.json({
-                "resourceType": "OperationOutcome",
-                "id": "exception",
-                "issue": [{
-                    "severity": "error",
-                    "code": "exception",
-                    "details": {
-                        "text": "Failed to register patient. CrossBorder ID or identifier is required"
-                    }
-                }]
-            });
-            return;
-        }
+        // if (!id && !identifier && (!(crossBorderId))) {
+        //     res.statusCode = 400;
+        //     res.json({
+        //         "resourceType": "OperationOutcome",
+        //         "id": "exception",
+        //         "issue": [{
+        //             "severity": "error",
+        //             "code": "exception",
+        //             "details": {
+        //                 "text": "Failed to register patient. CrossBorder ID or identifier is required"
+        //             }
+        //         }]
+        //     });
+        //     return;
+        // }
         // let url = new URL('/Patient')
         let params = []
         for (const k of Object.keys(queryParams)) {
@@ -38,8 +38,11 @@ router.get('/', async (req, res) => {
 
         let patient = (await FhirApi({ url: `/Patient?${params.join("&")}` })).data;
         if (patient) {
-            // patient = patient.entry[0].resource;
             res.statusCode = 200;
+            if (identifier) {
+                patient = patient.total > 0 ? patient.entry[0].resource : patient;
+                res.json(patient);
+            }
             res.json(patient);
             return;
         }
@@ -145,37 +148,37 @@ router.post('/', async (req, res) => {
     }
 });
 
-// patient search
-router.get('/search', async (req, res) => {
-    try {
-        let params = req.query;
-        let patients = (await FhirApi({
-            url: `/Patient${params?.name ? `?name=${params?.name}` : ""}${(params?.nationalId || params?.crossBorderId) ? `?identifier=${(params?.nationalId) || params?.crossBorderId}` : ''}`
-        })).data;
-        // console.log(patients);
-        // patients = patients.entry || [];
-        // patients = patients.map((patient: any) => {
-        //     return patient.resource;
-        // })
-        res.json(patients);
-        return;
-    } catch (error) {
-        console.error(error);
-        res.statusCode = 400;
-        res.json({
-            "resourceType": "OperationOutcome",
-            "id": "exception",
-            "issue": [{
-                "severity": "error",
-                "code": "exception",
-                "details": {
-                    "text": `Patient not found - ${JSON.stringify(error)}`
-                }
-            }]
-        });
-        return;
-    }
-});
+// // patient search
+// router.get('/search', async (req, res) => {
+//     try {
+//         let params = req.query;
+//         let patients = (await FhirApi({
+//             url: `/Patient${params?.name ? `?name=${params?.name}` : ""}${(params?.nationalId || params?.crossBorderId) ? `?identifier=${(params?.nationalId) || params?.crossBorderId}` : ''}`
+//         })).data;
+//         // console.log(patients);
+//         // patients = patients.entry || [];
+//         // patients = patients.map((patient: any) => {
+//         //     return patient.resource;
+//         // })
+//         res.json(patients);
+//         return;
+//     } catch (error) {
+//         console.error(error);
+//         res.statusCode = 400;
+//         res.json({
+//             "resourceType": "OperationOutcome",
+//             "id": "exception",
+//             "issue": [{
+//                 "severity": "error",
+//                 "code": "exception",
+//                 "details": {
+//                     "text": `Patient not found - ${JSON.stringify(error)}`
+//                 }
+//             }]
+//         });
+//         return;
+//     }
+// });
 
 
 // patient search
