@@ -14,22 +14,6 @@ router.get('/', async (req, res) => {
         let _queryParams: ParsedQs = req.query;
         let queryParams: Record<string, any> = { ..._queryParams }
         let { id, crossBorderId, identifier } = req.query;
-        // if (!id && !identifier && (!(crossBorderId))) {
-        //     res.statusCode = 400;
-        //     res.json({
-        //         "resourceType": "OperationOutcome",
-        //         "id": "exception",
-        //         "issue": [{
-        //             "severity": "error",
-        //             "code": "exception",
-        //             "details": {
-        //                 "text": "Failed to register patient. CrossBorder ID or identifier is required"
-        //             }
-        //         }]
-        //     });
-        //     return;
-        // }
-        // let url = new URL('/Patient')
         let params = []
         for (const k of Object.keys(queryParams)) {
             params.push(`${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`);
@@ -42,6 +26,7 @@ router.get('/', async (req, res) => {
             if (identifier) {
                 patient = patient.total > 0 ? patient.entry[0].resource : patient;
                 res.json(patient);
+                return;
             }
             res.json(patient);
             return;
