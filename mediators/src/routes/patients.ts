@@ -7,7 +7,6 @@ export const router = express.Router();
 
 router.use(express.json());
 
-
 // get patient information by crossborder ID
 router.get('/', async (req, res) => {
     try {
