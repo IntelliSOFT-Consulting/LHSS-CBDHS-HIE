@@ -17,7 +17,6 @@ router.get('/', async (req, res) => {
         for (const k of Object.keys(queryParams)) {
             params.push(`${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`);
         }
-        console.log(`/Patient?${params.join("&")}`)
 
         let patient = (await FhirApi({ url: `/Patient?${params.join("&")}` })).data;
         if (patient) {
@@ -66,24 +65,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         let data = req.body;
-        // let parsedPatient = parseFhirPatient(data);
-        // if (!parsedPatient) {
-        //     let error = "Invalid Patient resource - failed to parse resource";
-        //     res.statusCode = 400;
-        //     console.log(error);
-        //     res.json({
-        //         "resourceType": "OperationOutcome",
-        //         "id": "exception",
-        //         "issue": [{
-        //             "severity": "error",
-        //             "code": "exception",
-        //             "details": {
-        //                 "text": `Failed to find patient. ${JSON.stringify(error)}`
-        //             }
-        //         }]
-        //     });
-        //     return;
-        // }
+        
         let crossBorderId = generateCrossBorderId("Kenya");
         let sampleCrossborderId = {
             "id": "09e02f17-5cc7-4bd0-b957-34e4c8b5892b",
@@ -132,37 +114,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// // patient search
-// router.get('/search', async (req, res) => {
-//     try {
-//         let params = req.query;
-//         let patients = (await FhirApi({
-//             url: `/Patient${params?.name ? `?name=${params?.name}` : ""}${(params?.nationalId || params?.crossBorderId) ? `?identifier=${(params?.nationalId) || params?.crossBorderId}` : ''}`
-//         })).data;
-//         // console.log(patients);
-//         // patients = patients.entry || [];
-//         // patients = patients.map((patient: any) => {
-//         //     return patient.resource;
-//         // })
-//         res.json(patients);
-//         return;
-//     } catch (error) {
-//         console.error(error);
-//         res.statusCode = 400;
-//         res.json({
-//             "resourceType": "OperationOutcome",
-//             "id": "exception",
-//             "issue": [{
-//                 "severity": "error",
-//                 "code": "exception",
-//                 "details": {
-//                     "text": `Patient not found - ${JSON.stringify(error)}`
-//                 }
-//             }]
-//         });
-//         return;
-//     }
-// });
+
 
 
 // patient search
@@ -196,7 +148,7 @@ router.get('/summary', async (req, res) => {
 router.put('/', async (req, res) => {
     try {
         let data = req.body;
-        let crossBorderId = req.query.crossBorderId || null;
+        let crossBorderId = req.query.identifier || null;
         if (!crossBorderId) {
             let error = "crossBorderId is a required parameter"
             res.statusCode = 400;
@@ -213,23 +165,7 @@ router.put('/', async (req, res) => {
             });
             return;
         }
-        let parsedPatient = parseFhirPatient(data);
-        if (!parsedPatient) {
-            let error = "Invalid Patient resource - failed to parse resource"
-            res.statusCode = 400;
-            res.json({
-                "resourceType": "OperationOutcome",
-                "id": "exception",
-                "issue": [{
-                    "severity": "error",
-                    "code": "exception",
-                    "details": {
-                        "text": `Invalid Patient resource - ${JSON.stringify(error)}`
-                    }
-                }]
-            });
-            return;
-        }
+        
         let patient = await getPatientByCrossBorderId(String(crossBorderId) || '')
         if (!patient) {
             let error = "Invalid crossBorderId provided"
