@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 // ✅ Do this if using TYPESCRIPT
 import { RequestInfo, RequestInit } from 'node-fetch';
 import { uuid } from 'uuidv4';
+import { exists } from 'fs';
 
 // mediators to be registered
 const mediators = [
@@ -193,12 +194,50 @@ export const getPatientSummary = async (crossBorderId: string) => {
 }
 
 
+const letterToNumber = (str: any = '') => {
+    let result = '';
 
-export const generateCrossBorderId = (county: string) => {
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i].toUpperCase();
+
+        if (char >= 'A' && char <= 'Z') {
+            const number = (char.charCodeAt(0) - 64).toString().padStart(2, '0');
+            result += number;
+        }
+    }
+    return String(result) || "X";
+}
+
+const mapStringToNumber = (str: string) => {
+    let number = ''
+    for (let x of str.slice(0, 3)) {
+        number += letterToNumber(x)
+    }
+    return number;
+}
+
+
+export const generateCrossBorderId = async (patient: any) => {
     let month = new Date().getMonth() + 1;
-    let id = `${county.toUpperCase().slice(0, 2)}-${new Date().getFullYear()}-${(month < 10) ? '0' + month.toString() : month.toString()}-${uuid().slice(0, 5).toUpperCase()}`
+    let dob = new Date(patient.birthDate);
+    let gender = patient?.gender || null
+
+    let middleNameCode = mapStringToNumber(patient.name[0]?.given[1])
+    let givenNameCode = mapStringToNumber(patient.name[0]?.given[0])
+    let familyNameCode = mapStringToNumber(patient.name[0]?.family)
+    let countryCode = "X"
+    let genderCode = gender === 'male' ? "M" : gender === 'female' ? "F" : "X"
+    let monthCode = (dob.getMonth() + 1) || "X"
+    let year = dob.getFullYear() || "X"
+
+    let id = `${countryCode}-0${monthCode}${year}-${genderCode}-${givenNameCode}-${familyNameCode}-${middleNameCode}`;
+
+    // check if id exists
+    // let response = (await FhirApi({ url: `/Patient?identifier=${id}` })).data
+    // if(response?.entry){
+    //     return id
+    // }
     return id;
-    // check if it exists
 }
 
 export const getPatientByCrossBorderId = async (crossBorderId: string) => {

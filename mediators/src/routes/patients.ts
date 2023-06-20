@@ -65,8 +65,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         let data = req.body;
-        
-        let crossBorderId = generateCrossBorderId("Kenya");
+
+        let crossBorderId = generateCrossBorderId(data);
         let sampleCrossborderId = {
             "id": "09e02f17-5cc7-4bd0-b957-34e4c8b5892b",
             "use": "usual",
@@ -113,9 +113,6 @@ router.post('/', async (req, res) => {
         return;
     }
 });
-
-
-
 
 // patient search
 router.get('/summary', async (req, res) => {
@@ -165,7 +162,7 @@ router.put('/', async (req, res) => {
             });
             return;
         }
-        
+
         let patient = await getPatientByCrossBorderId(String(crossBorderId) || '')
         if (!patient) {
             let error = "Invalid crossBorderId provided"
