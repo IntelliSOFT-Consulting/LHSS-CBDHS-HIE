@@ -45,7 +45,7 @@ services:
 
     openhim-core:
         container_name: openhim-core
-        restart: on-failure
+        restart: unless-stopped
         image: jembi/openhim-core:latest
         environment:
             - mongo_url=mongodb://mongo/openhim

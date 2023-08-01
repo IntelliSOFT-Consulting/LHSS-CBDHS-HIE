@@ -31,7 +31,7 @@ services:
     hapi-fhir-jpa:
         image: intellisoftkenya/hapi-fhir:latest
         container_name: hapi-fhir-jpa
-        restart: on-failure
+        restart: unless-stopped
         networks:
             - hapi-fhir
         depends_on:
@@ -43,6 +43,7 @@ services:
 
     openhim-core:
         container_name: openhim-core
+        restart: unless-stopped
         image: jembi/openhim-core:latest
         environment:
             - mongo_url=mongodb://mongo/openhim
@@ -90,6 +91,7 @@ services:
             - openhim-core
         container_name: mediators
         build: mediators
+        restart: unless-stopped
         networks:
             - openhim
             - hapi-fhir
