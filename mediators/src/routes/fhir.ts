@@ -21,6 +21,7 @@ router.post('/', async (req, res) => {
             return;
         }
         let patientId = data.entry[0].response.location;
+        console.log(patientId)
         let patient = (await FhirApi({ url: `/${patientId}` })).data;
         let crossBorderId = await generateCrossBorderId(patient);
         // console.log(crossBorderId)
@@ -41,6 +42,7 @@ router.post('/', async (req, res) => {
         patient.identifier.push(sampleCrossborderId)
         let _data = await (await FhirApi({ url: `/Patient/${patient.id}`, method: 'PUT', data: JSON.stringify(patient) })).data;
         res.json(_data);
+        // res.json(patient);
         return;
     } catch (error) {
         console.log(error);
