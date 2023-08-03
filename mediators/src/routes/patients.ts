@@ -1,6 +1,5 @@
 import express from 'express';
 import { FhirApi, getPatientByCrossBorderId, generateCrossBorderId, getPatientSummary } from '../lib/utils';
-import { parseFhirPatient, Patient } from '../lib/resources';
 import { ParsedQs } from 'qs'
 
 export const router = express.Router();
