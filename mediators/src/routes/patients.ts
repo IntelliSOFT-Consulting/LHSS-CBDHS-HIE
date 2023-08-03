@@ -1,6 +1,5 @@
 import express from 'express';
 import { FhirApi, getPatientByCrossBorderId, generateCrossBorderId, getPatientSummary } from '../lib/utils';
-import { parseFhirPatient, Patient } from '../lib/resources';
 import { ParsedQs } from 'qs'
 
 export const router = express.Router();
@@ -65,9 +64,9 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         let data = req.body;
-
+        console.log(req.headers)
         let crossBorderId = await generateCrossBorderId(data);
-        console.log(crossBorderId)
+        // console.log(crossBorderId)
         let sampleCrossborderId = {
             "id": "09e02f17-5cc7-4bd0-b957-34e4c8b5892b",
             "use": "usual",

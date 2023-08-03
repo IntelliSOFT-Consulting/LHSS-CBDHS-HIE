@@ -31,7 +31,7 @@ services:
     hapi-fhir-jpa:
         image: intellisoftkenya/hapi-fhir:latest
         container_name: hapi-fhir-jpa
-        restart: on-failure
+        restart: unless-stopped
         networks:
             - hapi-fhir
         ports:
@@ -45,7 +45,7 @@ services:
 
     openhim-core:
         container_name: openhim-core
-        restart: on-failure
+        restart: unless-stopped
         image: jembi/openhim-core:latest
         environment:
             - mongo_url=mongodb://mongo/openhim
@@ -53,12 +53,12 @@ services:
             - authentication_enableJWTAuthentication=true
         ports:
             - "8080:8080"
-            - "5000:5000"
+            # - "5000:5000"
             - "5001:5001"
-            - "5050:5050"
-            - "5051:5051"
-            - "5052:5052"
-            - "7788:7788"
+            # - "5050:5050"
+            # - "5051:5051"
+            # - "5052:5052"
+            # - "7788:7788"
         depends_on:
             - mongo
         networks:
@@ -91,6 +91,7 @@ services:
     mediators:
         depends_on:
             - openhim-core
+            - hapi-fhir-jpa
         container_name: mediators
         restart: on-failure
         build:
@@ -106,20 +107,20 @@ services:
         env_file:
             - mediators/.env
 
-    hie-admin:
-        container_name: hie-admin
-        build:
-            context: admin
-            dockerfile: Dockerfile.dev
-        volumes:
-            - ./admin:/app/admin
-        networks:
-            - openhim
-            - mediators
-        ports:
-            - "8088:3000"
-        env_file:
-            - admin/.env
+    # hie-admin:
+    #     container_name: hie-admin
+    #     build:
+    #         context: admin
+    #         dockerfile: Dockerfile.dev
+    #     volumes:
+    #         - ./admin:/app/admin
+    #     networks:
+    #         - openhim
+    #         - mediators
+    #     ports:
+    #         - "8088:3000"
+    #     env_file:
+    #         - admin/.env
 
 volumes:
     mongodb-data:

@@ -14,6 +14,7 @@ import SHR from './routes/shr'
 import Data from './routes/data'
 import Facilities from "./routes/facilities";
 import Summary from "./routes/ips";
+import FHIR from './routes/fhir';
 
 // import Reports from './routes/reports'
 
@@ -48,6 +49,7 @@ app.use('/shr', SHR)
 app.use('/data', Data)
 app.use('/facilities', Facilities)
 app.use('/summary', Summary)
+app.use('/fhir', FHIR)
 
 
 
