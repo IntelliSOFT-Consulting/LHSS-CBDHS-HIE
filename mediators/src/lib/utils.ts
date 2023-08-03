@@ -224,8 +224,8 @@ export const generateCrossBorderId = async (patient: any) => {
     let dob = new Date(patient.birthDate);
     let gender = patient?.gender || null
 
-    let middleNameCode = mapStringToNumber(patient.name[0]?.given[1])
-    let givenNameCode = mapStringToNumber(patient.name[0]?.given[0])
+    let middleNameCode = mapStringToNumber(patient.name[0]?.given[1] || "X")
+    let givenNameCode = mapStringToNumber(patient.name[0]?.given[0] || "X")
     let familyNameCode = mapStringToNumber(patient.name[0]?.family)
     let countryCode = "X"
     let genderCode = gender === 'male' ? "M" : gender === 'female' ? "F" : "X"
