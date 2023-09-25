@@ -75,8 +75,6 @@ services:
         restart: unless-stopped
         networks:
             - openhim
-        ports:
-            - "9000:80"
         healthcheck:
             test: "curl -sS http://openhim-console || exit 1"
             interval: 30s
@@ -102,10 +100,12 @@ services:
     nginx:
         image: nginx:alpine
         container_name: nginx
+        restart: unless-stopped
         networks:
             - openhim
         ports:
-            - "8888:80"
+            - "80:80"
+            - "443:443"
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf:ro
         depends_on:
