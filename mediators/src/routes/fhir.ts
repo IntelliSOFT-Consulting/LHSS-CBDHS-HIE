@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
             "resourceType": "OperationOutcome",
             "id": "exception",
             "issue": [{
-                "severity": "error", "code": "exception", "details": { "text": error }
+                "severity": "error", "code": "exception", "details": { "text": "Failed to post FHIR bundle. Ensure bundle is valid" }
             }]
         });
         return;
