@@ -81,7 +81,7 @@ services:
             timeout: 30s
             retries: 3
         volumes:
-            - ./default.json:/usr/share/nginx/html/config/default.json
+            - ./default.json:/usr/share/nginx/html/config/default.json:ro
             - /etc/ssl/crt:/etc/nginx/certs
 
     mediators:
