@@ -14,12 +14,13 @@ router.use(express.json());
 router.post('/', async (req, res) => {
     try {
         let resource = req.body;
-        let data = await (await FhirApi({ url: ``, method: 'POST', data: JSON.stringify(resource) })).data
+        let data = await (await FhirApi({ url: `/`, method: 'POST', data: JSON.stringify(resource) })).data
         if (["Unprocessable Entity", "Bad Request"].indexOf(data.statusText) > 0) {
             // res.statusCode = 400;
             res.json(data);
             return;
         }
+        console.log(data);
         let patientId = data.entry[0].response.location;
         console.log(patientId)
         let patient = (await FhirApi({ url: `/${patientId}` })).data;
