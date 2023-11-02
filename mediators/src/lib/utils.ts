@@ -218,29 +218,40 @@ const mapStringToNumber = (str: string) => {
     return number;
 }
 
-
 export const generateCrossBorderId = async (patient: any) => {
-    let month = new Date().getMonth() + 1;
-    let dob = new Date(patient.birthDate);
-    let gender = patient?.gender || null
-
-    let middleNameCode = mapStringToNumber(patient.name[0]?.given[1] || "X")
-    let givenNameCode = mapStringToNumber(patient.name[0]?.given[0] || "X")
-    let familyNameCode = mapStringToNumber(patient.name[0]?.family)
-    let countryCode = "X"
-    let genderCode = gender === 'male' ? "M" : gender === 'female' ? "F" : "X"
-    let monthCode = (dob.getMonth() + 1) || "X"
-    let year = dob.getFullYear() || "X"
-
-    let id = `${countryCode}-0${monthCode}${year}-${genderCode}-${givenNameCode}-${familyNameCode}-${middleNameCode}`;
-
-    // check if id exists
-    // let response = (await FhirApi({ url: `/Patient?identifier=${id}` })).data
-    // if(response?.entry){
-    //     return id
-    // }
-    return id;
+    const characters = `ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`;
+    let result = '';
+    const charactersLength = 8;
+    for (let i = 0; i < charactersLength; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+    return `EAC${result}`;
 }
+
+
+// export const generateCrossBorderId = async (patient: any) => {
+//     let month = new Date().getMonth() + 1;
+//     let dob = new Date(patient.birthDate);
+//     let gender = patient?.gender || null
+
+//     let middleNameCode = mapStringToNumber(patient.name[0]?.given[1] || "X")
+//     let givenNameCode = mapStringToNumber(patient.name[0]?.given[0] || "X")
+//     let familyNameCode = mapStringToNumber(patient.name[0]?.family)
+//     let countryCode = "X"
+//     let genderCode = gender === 'male' ? "M" : gender === 'female' ? "F" : "X"
+//     let monthCode = (dob.getMonth() + 1) || "X"
+//     let year = dob.getFullYear() || "X"
+
+//     let id = `${countryCode}-0${monthCode}${year}-${genderCode}-${givenNameCode}-${familyNameCode}-${middleNameCode}`;
+
+//     // check if id exists
+//     // let response = (await FhirApi({ url: `/Patient?identifier=${id}` })).data
+//     // if(response?.entry){
+//     //     return id
+//     // }
+//     return id;
+// }
 
 export const getPatientByCrossBorderId = async (crossBorderId: string) => {
     try {
