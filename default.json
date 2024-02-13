@@ -1,22 +1,8 @@
 {
-<<<<<<< HEAD
-    "version": "1.10.0",
-    "minimumCoreVersion": "3.4.0",
-    "protocol": "https",
-    "host": "hiedhs.intellisoftkenya.com",
-    "port": 8080,
-    "title": "Admin Console",
-    "footerTitle": "CBDHS HIE Admin Console",
-    "footerPoweredBy": "<a href='http://openhim.org/' target='_blank'>LHSS CBDHS HIE</a>",
-    "loginBanner": "",
-    "mediatorLastHeartbeatWarningSeconds": 60,
-    "mediatorLastHeartbeatDangerSeconds": 120
-  }
-=======
   "version": "1.18.2",
   "minimumCoreVersion": "5.2.0",
   "protocol": "https",
-  "host": "localhost",
+  "host": "hiedhs.intellisoftkenya.com",
   "hostPath": "",
   "port": "8080",
   "title": "Admin Console",
@@ -31,4 +17,3 @@
   "keyCloakRealm": "platform-realm",
   "keyCloakClientId": "openhim-oauth"
 }
->>>>>>> 8b78097a7786135f8e65424a7869ea62de7f9441
