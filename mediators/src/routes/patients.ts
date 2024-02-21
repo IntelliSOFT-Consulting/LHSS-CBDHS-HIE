@@ -81,6 +81,9 @@ router.post('/', async (req, res) => {
             "system": "urn:oid:2.16.840.1.113883.3.26.1.3",
             "value": crossBorderId
         }
+        if (Object.keys(data).indexOf('identifier') < 0){
+            data.identifier = [];
+        }
         data.identifier.push(sampleCrossborderId)
         // console.log(parsedPatient);
         let patient = (await FhirApi({
