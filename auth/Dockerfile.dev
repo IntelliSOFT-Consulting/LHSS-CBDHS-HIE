@@ -1,5 +1,5 @@
 FROM node:alpine
-WORKDIR /usr/chanjoke-auth/
+WORKDIR /usr/cbdhs-auth/
 
 # COPY package.json .
 RUN npm install typescript yarn -g --force
