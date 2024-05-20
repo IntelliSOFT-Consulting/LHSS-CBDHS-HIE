@@ -177,5 +177,54 @@ router.post("/me", async (req: Request, res: Response) => {
     }
 });
 
+router.post("/register-admin", async (req: Request, res: Response) => {
+    try {
+        let {firstName, lastName, idNumber, email, phone, password} = req.body;
+
+        if(!firstName || !lastName || !idNumber || !email || !phone || !password){
+            res.statusCode = 400;
+            res.json({ status: "error", error: "first name, last name, ID number, email, phone and password are required" });
+            return;
+        }
+
+        let practitionerId = v4()
+
+        let practitionerResource = {
+            "resourceType": "Practitioner",
+            "id": practitionerId,
+            "identifier": [
+                {
+                    "system": "http://hl7.org/fhir/administrative-identifier",
+                    "value": idNumber
+                }
+            ],
+            "name": [{"use": "official", "family": lastName, "given": [firstName]}]
+        }
+
+        let keyCloakUser = await registerKeycloakUser(idNumber, email, phone, firstName, lastName, password, null, practitionerId, null)
+
+        if(keyCloakUser){
+            res.statusCode = 400;
+            res.json({status: "error", error: "Failed to register admin user"});
+            return;
+        }
+
+        if(Object.keys(keyCloakUser).indexOf('error') > -1){
+            res.statusCode = 400;
+            res.json({...keyCloakUser, status: "error"})
+            return;
+        }
+
+        res.statusCode = 201;
+        res.json({response: keyCloakUser.success, status: "success"})
+        return
+
+    } catch (error) {
+        res.statusCode = 401;
+        res.json({ error: "incorrect email or password", status:"error" });
+        return;
+    }
+})
+
 
 export default router
