@@ -46,7 +46,7 @@ router.post("/register", async (req: Request, res: Response) => {
               ]
             // "telecom": [{"system": "phone","value": "123-456-7890"}]
         };
-        let keycloakUser = await registerKeycloakUser(idNumber, email, phone, firstName, 
+        let keycloakUser = await registerKeycloakUser(idNumber, email, phone, firstName,
                     lastName, password, null, practitionerId, role);
         if(!keycloakUser){
             res.statusCode = 400;
@@ -117,7 +117,7 @@ router.get("/me", async (req: Request, res: Response) => {
         let facilityId = practitioner.extension[0].valueReference.reference;
         res.statusCode = 200;
         res.json({ status: "success", user:{ firstName: userInfo.firstName,lastName: userInfo.lastName,
-            fhirPractitionerId:userInfo.attributes.fhirPractitionerId[0], 
+            fhirPractitionerId:userInfo.attributes.fhirPractitionerId[0],
             practitionerRole: userInfo.attributes.practitionerRole[0],
             id: userInfo.id, idNumber: userInfo.username, fullNames: currentUser.name,
             phone: (userInfo.attributes?.phone ? userInfo.attributes?.phone[0] : null) , email: userInfo.email ?? null,
@@ -161,7 +161,7 @@ router.post("/me", async (req: Request, res: Response) => {
         // }
         res.statusCode = 200;
         res.json({ status: "success", user:{ firstName: userInfo.firstName,lastName: userInfo.lastName,
-            fhirPractitionerId:userInfo.attributes.fhirPractitionerId[0], 
+            fhirPractitionerId:userInfo.attributes.fhirPractitionerId[0],
             practitionerRole: userInfo.attributes.practitionerRole[0],
             id: userInfo.id, idNumber: userInfo.username, fullNames: currentUser.name,
             phone: (userInfo.attributes?.phone ? userInfo.attributes?.phone[0] : null) , email: userInfo.email ?? null,
@@ -214,6 +214,8 @@ router.post("/register-admin", async (req: Request, res: Response) => {
             res.json({...keyCloakUser, status: "error"})
             return;
         }
+
+     await FhirApi({url:`/Practitioner/${practitionerId}`, method:"PUT", data: JSON.stringify(practitionerResource)})
 
         res.statusCode = 201;
         res.json({response: keyCloakUser.success, status: "success"})
