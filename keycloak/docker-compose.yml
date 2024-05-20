@@ -1,0 +1,34 @@
+version: '3'
+
+volumes:
+  keycloak-postgres:
+      driver: local
+
+networks:
+  cloudbuild:
+    external: true
+
+services:
+  keycloak-postgres:
+      image: postgres:14-alpine
+      restart: always
+      networks:
+            - cloudbuild
+      environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: keycloak
+          POSTGRES_PASSWORD: keycloak_not_123
+      volumes:
+        - 'keycloak-postgres:/var/lib/postgresql/data'
+
+  keycloak:
+      image: quay.io/keycloak/keycloak:latest
+      restart: always
+      networks:
+        - cloudbuild
+      env_file:
+        - ./keycloak/.env
+      depends_on:
+        - keycloak-postgres
+      command: start-dev
+      

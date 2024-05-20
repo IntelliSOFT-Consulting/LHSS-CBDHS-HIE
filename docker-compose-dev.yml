@@ -77,8 +77,8 @@ services:
         restart: on-failure
         networks:
             - openhim
-        # ports:
-            # - "9000:80"
+        ports:
+            - "9000:80"
         healthcheck:
             test: "curl -sS http://openhim-console || exit 1"
             interval: 30s

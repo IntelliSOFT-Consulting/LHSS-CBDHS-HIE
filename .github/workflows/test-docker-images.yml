@@ -13,4 +13,6 @@
         - name: Start containers
           run: |
             cp mediators/.env.example mediators/.env
+            cp auth/.env.example auth/.env
+            docker network create cloudbuild
             docker-compose -f "docker-compose.yml" up -d --build
