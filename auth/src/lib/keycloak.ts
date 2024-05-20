@@ -63,6 +63,39 @@ export const findKeycloakUser = async (username: string) => {
     }
 }
 
+export const getKeycloakUsers = async () => {
+  try {
+    const accessToken = (await getKeycloakAdminToken()).access_token;
+    const response = await (await fetch(
+      `${KC_BASE_URL}/admin/realms/${KC_REALM}/users`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )).json();
+    // console.log(response);
+    // return response.data;
+
+    let responseData: any = [];
+    response.map((i: any) =>{
+      responseData.push({
+        username: i.username, 
+        firstName: i.firstName, 
+        lastName: i.lastName, 
+        email: i.email, 
+        phone: i.attributes?.phone[0],
+        role: i.attributes?.practitionerRole[0]
+      })
+    });
+    return responseData;
+  } catch (error) {
+    console.log(error);
+   return null;   
+  }
+}
+
 
 export const updateUserPassword = async (username: string, password: string) => {
   try {

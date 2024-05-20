@@ -84,5 +84,3 @@ export const getPatientById = async (crossBorderId: string) => {
     }
 }
 
-
-// export const getPractitionerLocation = async ( practitioner: String)
