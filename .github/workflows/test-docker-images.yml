@@ -13,4 +13,5 @@
         - name: Start containers
           run: |
             cp mediators/.env.example mediators/.env
+            cp auth/.env.example auth/.env
             docker-compose -f "docker-compose.yml" up -d --build
