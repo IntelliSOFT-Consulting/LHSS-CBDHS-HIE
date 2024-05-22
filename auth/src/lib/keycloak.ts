@@ -1,5 +1,6 @@
 import fetch from "cross-fetch";
 import { createHash, randomBytes } from 'crypto';
+import { FhirApi } from "./utils";
 
 
 let KC_BASE_URL = String(process.env.KC_BASE_URL);
@@ -119,7 +120,8 @@ export const updateUserPassword = async (username: string, password: string) => 
   }
 }
 
-export const updateUserProfile = async (username:string, phone: string | null, email: string | null) => {
+
+export const updateUserProfile = async (username:string, phone: string | null, email: string | null, firstName: string | null,  lastName: string | null, fhirPractitionerId: string | null=null) => {
   try {
     let user = (await findKeycloakUser(username));
     const accessToken = (await getKeycloakAdminToken()).access_token;
@@ -127,7 +129,12 @@ export const updateUserProfile = async (username:string, phone: string | null, e
       `${KC_BASE_URL}/admin/realms/${KC_REALM}/users/${user.id}`,
       {headers: {Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json', }, method: "PUT",
       body: JSON.stringify({
-        ...(phone) && {attributes: {...user.attributes, phone:[phone]}}, ...(email) &&  {email}})
+        ...(phone) && {attributes: {...user.attributes, phone:[phone]}},
+        ...(fhirPractitionerId) && {attributes: {...user.attributes, fhirPractitionerId:[fhirPractitionerId]}}, 
+        ...(email) &&  {email},
+        ...(firstName) &&  {firstName},
+        ...(lastName) &&  {lastName},
+      })
       }
     ));
     // let result = await response.json()
