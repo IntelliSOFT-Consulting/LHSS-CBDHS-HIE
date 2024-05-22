@@ -118,10 +118,10 @@ router.post("/me", async (req: Request, res: Response) => {
             return;
         }
         // allow phone number & email
-        let {phone, email} = req.body;
+        let {phone, email, firstName, lastName} = req.body;
         let currentUser = await getCurrentUserInfo(accessToken);
         console.log(currentUser);
-        await updateUserProfile(currentUser.preferred_username, phone, email);
+        let updatedInfo = await updateUserProfile(currentUser.preferred_username, phone, email, firstName, lastName);
         let userInfo = await findKeycloakUser(currentUser.preferred_username);
         if(!currentUser){
             res.statusCode = 401;
