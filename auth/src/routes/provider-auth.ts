@@ -173,18 +173,20 @@ router.post("/me", async (req: Request, res: Response) => {
             return;
         }
         // allow phone number & email
-        let { phone, email } = req.body;
+        let { phone, email, firstName, lastName } = req.body;
         let currentUser = await getCurrentUserInfo(accessToken);
         if (!currentUser) {
             res.statusCode = 401;
             res.json({ status: "error", error: "Invalid Bearer token provided" });
             return;
         }
-        let response = await updateUserProfile(currentUser.preferred_username, phone, email);
-        console.log(response);
+        let response = await updateUserProfile(currentUser.preferred_username, phone, email, firstName, lastName);
+        // console.log(response);
         let userInfo = await findKeycloakUser(currentUser.preferred_username);
-        let practitioner = await (await FhirApi({ url: `/Practitioner/${userInfo.attributes.fhirPractitionerId[0]}` })).data;
-        let facilityId = practitioner.extension[0].valueReference.reference ?? null;
+        // console.log(userInfo)
+        let practitioner = await (await FhirApi({ url: `/Practitioner/${userInfo?.attributes?.fhirPractitioner?.[0]}` })).data;
+        // console.log(practitioner);
+        let facilityId = practitioner?.extension?.[0]?.valueReference?.reference ?? null;
         // if(!facilityId && userInfo.attributes.practitionerRole[0]){
         //     res.statusCode = 401;
         //     res.json({ status: "error", error: "Provide must be assigned to a facility first"  });
@@ -193,10 +195,10 @@ router.post("/me", async (req: Request, res: Response) => {
         res.statusCode = 200;
         res.json({
             status: "success", user: {
-                firstName: userInfo.firstName, lastName: userInfo.lastName,
-                fhirPractitionerId: userInfo.attributes.fhirPractitionerId[0],
-                practitionerRole: userInfo.attributes.practitionerRole[0],
-                id: userInfo.id, idNumber: userInfo.username, fullNames: currentUser.name,
+                firstName: userInfo?.firstName, lastName: userInfo?.lastName,
+                fhirPractitionerId: userInfo?.attributes?.fhirPractitionerId?.[0],
+                practitionerRole: userInfo?.attributes?.practitionerRole?.[0],
+                id: userInfo?.id, idNumber: userInfo?.username, fullNames: `${userInfo.firstName} ${userInfo.lastName}`,
                 phone: (userInfo.attributes?.phone ? userInfo.attributes?.phone[0] : null), email: userInfo.email ?? null,
                 facility: facilityId
             }
