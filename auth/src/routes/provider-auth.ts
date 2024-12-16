@@ -9,7 +9,7 @@ router.use(express.json());
 router.post("/register", async (req: Request, res: Response) => {
     try {
         // get id number and unique code
-        let { firstName, lastName, idNumber, password, role, email, phone, facility } = req.body;
+        let { firstName, lastName, idNumber, password, role, email, phone, facility, location } = req.body;
         // console.log(req.body);
         if (!password || !idNumber || !firstName || !lastName || !role || !email) {
             res.statusCode = 400;
@@ -35,9 +35,9 @@ router.post("/register", async (req: Request, res: Response) => {
             return;
         }
         let practitionerId = v4();
-        let location = await (await FhirApi({ url: `/Location/${facility}` })).data;
+        let _location = await (await FhirApi({ url: `/Location/${facility ?? location}` })).data;
         // console.log(location)
-        if (location.resourceType != "Location") {
+        if (_location.resourceType != "Location") {
             res.statusCode = 400;
             res.json({ status: "error", error: "Failed to register client user. Invalid location provided" });
             return;
@@ -57,8 +57,8 @@ router.post("/register", async (req: Request, res: Response) => {
                 {
                     "url": "http://example.org/location",
                     "valueReference": {
-                        "reference": `Location/${location.id}`,
-                        "display": location.display
+                        "reference": `Location/${_location.id}`,
+                        "display": _location.display
                     }
                 }
             ]
@@ -125,6 +125,7 @@ router.get("/me", async (req: Request, res: Response) => {
             return;
         }
         let currentUser = await getCurrentUserInfo(accessToken);
+        console.log(currentUser);
         if (!currentUser) {
             res.statusCode = 401;
             res.json({ status: "error", error: "Invalid Bearer token provided" });
