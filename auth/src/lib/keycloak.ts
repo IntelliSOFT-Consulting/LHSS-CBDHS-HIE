@@ -238,9 +238,9 @@ export const getCurrentUserInfo = async (accessToken: string) => {
         "Content-Type":"application/json"
       },
     });
-    // console.log(response);
+    console.log(response);
     let result = await response.json();
-    // console.log(result);
+    console.log(result);
     // Handle response
     if (response.ok) {
       // const userInfo = await response.json();
